@@ -1,0 +1,56 @@
+[
+  {
+    "city": "MUMBAI",
+    "airportCode": "BOM",
+    "_comment": "SYNTHETIC MOCK DATA FOR PROTOTYPE"
+  },
+  {
+    "city": "DELHI",
+    "airportCode": "DEL"
+  },
+  {
+    "city": "BENGALURU",
+    "airportCode": "BLR"
+  },
+  {
+    "city": "HYDERABAD",
+    "airportCode": "HYD"
+  },
+  {
+    "city": "CHENNAI",
+    "airportCode": "MAA"
+  },
+  {
+    "city": "KOLKATA",
+    "airportCode": "CCU"
+  },
+  {
+    "city": "AHMEDABAD",
+    "airportCode": "AMD"
+  },
+  {
+    "city": "PUNE",
+    "airportCode": "PNQ"
+  },
+  {
+    "city": "GOA",
+    "airportCode": "GOI"
+  },
+  {
+    "city": "KOCHI",
+    "airportCode": "COK"
+  },
+  {
+    "city": "JAIPUR",
+    "airportCode": "JAI"
+  },
+  {
+    "city": "LUCKNOW",
+    "airportCode": "LKO"
+  },
+  {
+    "city": "CHANDIGARH",
+    "airportCode": "IXC"
+  }
+]
+

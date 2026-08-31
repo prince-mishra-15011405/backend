@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Tester | India Airfare Intelligence</title>
+  <meta name="description" content="Interactive API route tester for the India Airfare Price Index REST API.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================ */
+    /*  Design Tokens                               */
+    /* ============================================ */
+    :root {
+      --bg-base: #050a14;
+      --bg-primary: #0a1023;
+      --bg-card: rgba(12, 19, 38, 0.82);
+      --bg-card-hover: rgba(20, 32, 58, 0.92);
+      --bg-input: rgba(8, 14, 30, 0.9);
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --border-accent: rgba(6, 182, 212, 0.35);
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --cyan-400: #22d3ee;
+      --cyan-500: #06b6d4;
+      --cyan-glow: rgba(6, 182, 212, 0.3);
+      --indigo-400: #818cf8;
+      --indigo-500: #6366f1;
+      --emerald-400: #34d399;
+      --emerald-500: #10b981;
+      --rose-400: #fb7185;
+      --amber-400: #fbbf24;
+      --violet-400: #a78bfa;
+      --orange-400: #fb923c;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 20px;
+      --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3);
+      --shadow-glow: 0 0 20px rgba(6, 182, 212, 0.15);
+      --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ============================================ */
+    /*  Reset & Base                                */
+    /* ============================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* Subtle animated gradient bg */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 20% 10%, rgba(6, 182, 212, 0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(99, 102, 241, 0.05) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ============================================ */
+    /*  Layout                                      */
+    /* ============================================ */
+    .app-container {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    /* ============================================ */
+    /*  Header                                      */
+    /* ============================================ */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--cyan-400);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 16px;
+    }
+
+    .header-badge::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      background: var(--cyan-400);
+      border-radius: 50%;
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.6); }
+      50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(6, 182, 212, 0); }
+    }
+
+    .header h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--cyan-400) 0%, var(--indigo-400) 50%, var(--violet-400) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      color: var(--text-secondary);
+      font-size: 15px;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* Base URL bar */
+    .base-url-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .base-url-bar label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .base-url-bar input {
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--cyan-400);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 8px 14px;
+      width: 300px;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+
+    .base-url-bar input:focus {
+      border-color: var(--border-accent);
+    }
+
+    /* ============================================ */
+    /*  Category Sections                           */
+    /* ============================================ */
+    .category {
+      margin-bottom: 36px;
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .category-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .category-header h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .category-header .category-count {
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.05);
+      padding: 3px 10px;
+      border-radius: 100px;
+    }
+
+    /* Category color themes */
+    .cat-system .category-icon { background: rgba(6, 182, 212, 0.15); color: var(--cyan-400); }
+    .cat-dashboard .category-icon { background: rgba(99, 102, 241, 0.15); color: var(--indigo-400); }
+    .cat-routes .category-icon { background: rgba(52, 211, 153, 0.15); color: var(--emerald-400); }
+    .cat-search .category-icon { background: rgba(251, 191, 36, 0.15); color: var(--amber-400); }
+    .cat-data .category-icon { background: rgba(167, 139, 250, 0.15); color: var(--violet-400); }
+    .cat-scraper .category-icon { background: rgba(251, 113, 133, 0.15); color: var(--rose-400); }
+    .cat-cpi .category-icon { background: rgba(249, 146, 60, 0.15); color: var(--orange-400); }
+
+    /* ============================================ */
+    /*  Route Card                                  */
+    /* ============================================ */
+    .route-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: all var(--transition);
+      margin-bottom: 12px;
+      backdrop-filter: blur(12px);
+    }
+
+    .route-card:hover {
+      border-color: var(--border-accent);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .route-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      cursor: pointer;
+      user-select: none;
+      transition: background var(--transition);
+    }
+
+    .route-card-header:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .method-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      letter-spacing: 0.5px;
+      min-width: 58px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .method-GET {
+      background: rgba(52, 211, 153, 0.12);
+      color: var(--emerald-400);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+    }
+
+    .method-POST {
+      background: rgba(99, 102, 241, 0.12);
+      color: var(--indigo-400);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+    }
+
+    .method-PATCH {
+      background: rgba(251, 191, 36, 0.12);
+      color: var(--amber-400);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+    }
+
+    .method-DELETE {
+      background: rgba(251, 113, 133, 0.12);
+      color: var(--rose-400);
+      border: 1px solid rgba(251, 113, 133, 0.25);
+    }
+
+    .route-path {
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .route-path .param {
+      color: var(--amber-400);
+    }
+
+    .route-desc {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 400;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 260px;
+    }
+
+    .route-expand-icon {
+      color: var(--text-muted);
+      font-size: 14px;
+      transition: transform var(--transition);
+      flex-shrink: 0;
+    }
+
+    .route-card.expanded .route-expand-icon {
+      transform: rotate(180deg);
+    }
+
+    /* ============================================ */
+    /*  Route Card Body (expanded)                  */
+    /* ============================================ */
+    .route-card-body {
+      display: none;
+      padding: 0 18px 18px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .route-card.expanded .route-card-body {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .param-section {
+      margin-top: 14px;
+    }
+
+    .param-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 8px;
+    }
+
+    .param-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .param-row label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      min-width: 120px;
+      flex-shrink: 0;
+    }
+
+    .param-row input, .param-row select {
+      flex: 1;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 7px 12px;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+
+    .param-row input:focus, .param-row select:focus {
+      border-color: var(--border-accent);
+    }
+
+    .param-row input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .param-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      min-width: 80px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* Body editor (for POST/PATCH) */
+    .body-editor {
+      margin-top: 14px;
+    }
+
+    .body-editor textarea {
+      width: 100%;
+      min-height: 100px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 12px;
+      outline: none;
+      resize: vertical;
+      transition: border-color var(--transition);
+      line-height: 1.5;
+    }
+
+    .body-editor textarea:focus {
+      border-color: var(--border-accent);
+    }
+
+    /* Action bar */
+    .action-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .btn-send {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 22px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      color: #fff;
+    }
+
+    .btn-send-get {
+      background: linear-gradient(135deg, var(--emerald-500), #059669);
+      box-shadow: 0 2px 12px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-send-get:hover {
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-send-post {
+      background: linear-gradient(135deg, var(--indigo-500), #4f46e5);
+      box-shadow: 0 2px 12px rgba(99, 102, 241, 0.25);
+    }
+
+    .btn-send-post:hover {
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-send-patch {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      box-shadow: 0 2px 12px rgba(217, 119, 6, 0.25);
+    }
+
+    .btn-send-patch:hover {
+      box-shadow: 0 4px 20px rgba(217, 119, 6, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-send-delete {
+      background: linear-gradient(135deg, #e11d48, #be123c);
+      box-shadow: 0 2px 12px rgba(225, 29, 72, 0.25);
+    }
+
+    .btn-send-delete:hover {
+      box-shadow: 0 4px 20px rgba(225, 29, 72, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-send:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .btn-send.loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .btn-send.loading::after {
+      content: '';
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .response-meta {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+    }
+
+    .response-status {
+      padding: 3px 10px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+    }
+
+    .response-status.status-2xx {
+      background: rgba(52, 211, 153, 0.12);
+      color: var(--emerald-400);
+    }
+
+    .response-status.status-4xx {
+      background: rgba(251, 191, 36, 0.12);
+      color: var(--amber-400);
+    }
+
+    .response-status.status-5xx {
+      background: rgba(251, 113, 133, 0.12);
+      color: var(--rose-400);
+    }
+
+    .response-time {
+      color: var(--text-muted);
+    }
+
+    /* Response viewer */
+    .response-viewer {
+      margin-top: 14px;
+      background: rgba(4, 8, 18, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .response-viewer-header {
+      display: flex;
+      align-items: center;
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .response-viewer-header span {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-copy {
+      margin-left: auto;
+      background: none;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--transition);
+      font-family: var(--font-sans);
+    }
+
+    .btn-copy:hover {
+      border-color: var(--border-accent);
+      color: var(--cyan-400);
+    }
+
+    .response-body {
+      padding: 14px;
+      max-height: 420px;
+      overflow: auto;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .response-body::-webkit-scrollbar { width: 6px; }
+    .response-body::-webkit-scrollbar-track { background: transparent; }
+    .response-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+    /* JSON syntax highlighting */
+    .json-key { color: var(--cyan-400); }
+    .json-string { color: var(--emerald-400); }
+    .json-number { color: var(--amber-400); }
+    .json-boolean { color: var(--violet-400); }
+    .json-null { color: var(--rose-400); }
+
+    /* ============================================ */
+    /*  Scroll to top                               */
+    /* ============================================ */
+    .scroll-top {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--transition);
+      z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .scroll-top:hover {
+      border-color: var(--border-accent);
+      color: var(--cyan-400);
+      transform: translateY(-2px);
+    }
+
+    /* ============================================ */
+    /*  Empty state                                 */
+    /* ============================================ */
+    .empty-response {
+      text-align: center;
+      padding: 28px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .empty-response .icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+      opacity: 0.5;
+    }
+
+    /* ============================================ */
+    /*  Footer                                      */
+    /* ============================================ */
+    .footer {
+      text-align: center;
+      padding: 40px 0 0;
+      color: var(--text-muted);
+      font-size: 12px;
+      border-top: 1px solid var(--border-subtle);
+      margin-top: 40px;
+    }
+
+    /* ============================================ */
+    /*  Responsive                                  */
+    /* ============================================ */
+    @media (max-width: 700px) {
+      .header h1 { font-size: 1.6rem; }
+      .route-desc { display: none; }
+      .param-row { flex-wrap: wrap; }
+      .param-row label { min-width: 100%; }
+      .param-hint { display: none; }
+      .response-meta { flex-wrap: wrap; }
+      .base-url-bar { flex-direction: column; }
+      .base-url-bar input { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Header -->
+  <header class="header" id="header-top">
+    <div class="header-badge">API Tester</div>
+    <h1>Airfare API Explorer</h1>
+    <p>Preview and test all REST API endpoints for the India Airfare Intelligence system.</p>
+    <div class="base-url-bar">
+      <label>Base URL</label>
+      <input type="text" id="baseUrl" value="http://localhost:5000" placeholder="http://localhost:5000">
+    </div>
+  </header>
+
+  <!-- Routes container (populated by JS) -->
+  <main id="routes-container"></main>
+
+  <footer class="footer">
+    India Airfare Price Index &mdash; API Tester v1.0
+  </footer>
+</div>
+
+<button class="scroll-top" id="scrollTopBtn" title="Scroll to top">&#8593;</button>
+
+<script>
+// =========================================================================
+//  ROUTE DEFINITIONS
+// =========================================================================
+const API_ROUTES = [
+  // ─── System & Health ─────────────────────────────────────────────
+  {
+    category: "System & Health",
+    catClass: "cat-system",
+    icon: "⚡",
+    routes: [
+      {
+        method: "GET",
+        path: "/api/health",
+        desc: "Health check & uptime",
+        params: []
+      },
+      {
+        method: "POST",
+        path: "/api/refresh",
+        desc: "Refresh index data cache",
+        params: [],
+        body: null
+      }
+    ]
+  },
+  // ─── Index ───────────────────────────────────────────────────────
+  {
+    category: "Airfare Index",
+    catClass: "cat-dashboard",
+    icon: "📊",
+    routes: [
+      {
+        method: "GET",
+        path: "/api/index",
+        desc: "Current airfare index value",
+        params: []
+      },
+      {
+        method: "GET",
+        path: "/api/index/history",
+        desc: "Historical index time-series",
+        params: []
+      }
+    ]
+  },
+  // ─── Dashboard ───────────────────────────────────────────────────
+  {
+    category: "Dashboard",
+    catClass: "cat-dashboard",
+    icon: "📈",
+    routes: [
+      {
+        method: "GET",
+        path: "/api/dashboard",
+        desc: "Full dashboard summary payload",
+        params: []
+      }
+    ]
+  },
+  // ─── Routes ──────────────────────────────────────────────────────
+  {
+    category: "Route Intelligence",
+    catClass: "cat-routes",
+    icon: "✈️",
+    routes: [
+      {
+        method: "GET",
+        path: "/api/routes",
+        desc: "List tracked routes",
+        params: [
+          { name: "limit", placeholder: "10", hint: "optional" },
+          { name: "sort", placeholder: "fare_desc", hint: "optional" },
+          { name: "search", placeholder: "DEL", hint: "optional" }
+        ]
+      },
+      {
+        method: "GET",
+        path: "/api/routes/:route",
+        desc: "Route detail by ID",
+        params: [
+          { name: ":route", placeholder: "DEL-BOM", hint: "required", isPath: true }
+        ]
+      },
+      {
+        method: "GET",
+        path: "/api/routes/:route/history",
+        desc: "Fare history for a route",
+        params: [
+          { name: ":route", placeholder: "DEL-BOM", hint: "required", isPath: true },
+          { name: "period", placeholder: "30d", hint: "optional" }
+        ]
+      }
+    ]
+  },
+  // ─── Search ──────────────────────────────────────────────────────
+  {
+    category: "Search",
+    catClass: "cat-search",
+    icon: "🔍",
+    routes: [
+      {
+        method: "GET",
+        path: "/api/search",
+        desc: "Search routes / cities / airlines",
+        params: [
+          { name: "q", placeholder: "DEL-BOM", hint: "query text" },
+          { name: "origin", placeholder: "DEL", hint: "optional" },
+          { name: "destination", placeholder: "BOM", hint: "optional" },
+          { name: "departureDate", placeholder: "2026-09-15", hint: "optional" },
+          { name: "days", placeholder: "30", hint: "days count (default 30)" },
+          { name: "source", placeholder: "Air India", hint: "optional" }
+        ]
+      }
+    ]
+  },
+  // ─── Data & Quality ──────────────────────────────────────────────
+  {
+    category: "Data & Quality",
+    catClass: "cat-data",
+    icon: "🗄️",
+    routes: [
+      {
+        method: "GET",
+        path: "/api/data/status",
+        desc: "Data pipeline status",
+        params: []
+      },
+      {
+        method: "GET",
+        path: "/api/data/quality",
+        desc: "Data quality metrics",
+        params: []
+      }
+    ]
+  },
+  // ─── Scraper Management ──────────────────────────────────────────
+  {
+    category: "Scraper Management",
+    catClass: "cat-scraper",
+    icon: "🤖",
+    routes: [
+      {
+        method: "POST",
+        path: "/api/scraper/run",
+        desc: "Manually trigger scrape cycle (all, jobId, or route)",
+        params: [],
+        body: JSON.stringify({ jobId: "", origin: "DEL", destination: "GOI", days: 30 }, null, 2)
+      },
+      {
+        method: "GET",
+        path: "/api/scraper/status",
+        desc: "Scraper runtime status",
+        params: []
+      },
+      {
+        method: "GET",
+        path: "/api/scraper/jobs",
+        desc: "List all scrape jobs",
+        params: []
+      },
+      {
+        method: "POST",
+        path: "/api/scraper/jobs",
+        desc: "Create a new scrape job",
+        params: [],
+        body: JSON.stringify({
+          source: "Air India",
+          origin: "DEL",
+          destination: "BOM",
+          departureDate: "2026-09-15",
+          days: 30,
+          enabled: true,
+          priority: 1
+        }, null, 2)
+      },
+      {
+        method: "PATCH",
+        path: "/api/scraper/jobs/:id",
+        desc: "Update an existing scrape job",
+        params: [
+          { name: ":id", placeholder: "job_id_here", hint: "required", isPath: true }
+        ],
+        body: JSON.stringify({ enabled: false }, null, 2)
+      },
+      {
+        method: "DELETE",
+        path: "/api/scraper/jobs/:id",
+        desc: "Delete a scrape job",
+        params: [
+          { name: ":id", placeholder: "job_id_here", hint: "required", isPath: true }
+        ]
+      }
+    ]
+  },
+  // ─── CPI Augmentation ────────────────────────────────────────────
+  {
+    category: "CPI & Inflation",
+    catClass: "cat-cpi",
+    icon: "🏛️",
+    routes: [
+      {
+        method: "GET",
+        path: "/api/cpi",
+        desc: "CPI summary overview",
+        params: []
+      },
+      {
+        method: "GET",
+        path: "/api/cpi/summary",
+        desc: "CPI summary (alias)",
+        params: []
+      },
+      {
+        method: "GET",
+        path: "/api/cpi/comparison",
+        desc: "Real-time vs MOSPI official comparison",
+        params: []
+      },
+      {
+        method: "GET",
+        path: "/api/cpi/decomposition",
+        desc: "Route-level CPI decomposition",
+        params: []
+      },
+      {
+        method: "GET",
+        path: "/api/cpi/routes",
+        desc: "CPI route decomposition (alias)",
+        params: []
+      },
+      {
+        method: "GET",
+        path: "/api/cpi/simulate",
+        desc: "Inflation shock simulator",
+        params: [
+          { name: "shocks", placeholder: "-20,-10,0,10,20,30", hint: "comma-separated" },
+          { name: "shock", placeholder: "15", hint: "single value" }
+        ]
+      }
+    ]
+  }
+];
+
+// =========================================================================
+//  RENDER
+// =========================================================================
+const container = document.getElementById("routes-container");
+
+let routeIdx = 0;
+
+API_ROUTES.forEach(cat => {
+  const section = document.createElement("section");
+  section.className = `category ${cat.catClass}`;
+
+  section.innerHTML = `
+    <div class="category-header">
+      <div class="category-icon">${cat.icon}</div>
+      <h2>${cat.category}</h2>
+      <span class="category-count">${cat.routes.length} endpoint${cat.routes.length > 1 ? 's' : ''}</span>
+    </div>
+  `;
+
+  cat.routes.forEach(route => {
+    const id = `route-${routeIdx++}`;
+    const card = document.createElement("div");
+    card.className = "route-card";
+    card.id = id;
+
+    const pathHtml = route.path.replace(/:(\w+)/g, '<span class="param">:$1</span>');
+
+    // Build params HTML
+    let paramsHtml = "";
+    if (route.params && route.params.length > 0) {
+      const paramRows = route.params.map(p =>
+        `<div class="param-row">
+          <label>${p.name}</label>
+          <input type="text" data-param="${p.name}" data-ispath="${!!p.isPath}" placeholder="${p.placeholder || ''}">
+          <span class="param-hint">${p.hint || ''}</span>
+        </div>`
+      ).join("");
+
+      paramsHtml = `
+        <div class="param-section">
+          <div class="param-section-title">Parameters</div>
+          ${paramRows}
+        </div>
+      `;
+    }
+
+    // Body editor for POST/PATCH
+    let bodyHtml = "";
+    if (route.body !== undefined) {
+      bodyHtml = `
+        <div class="body-editor">
+          <div class="param-section-title">Request Body (JSON)</div>
+          <textarea data-body="true">${route.body || '{}'}</textarea>
+        </div>
+      `;
+    }
+
+    const btnClass = `btn-send btn-send-${route.method.toLowerCase()}`;
+
+    card.innerHTML = `
+      <div class="route-card-header" onclick="toggleCard('${id}')">
+        <span class="method-badge method-${route.method}">${route.method}</span>
+        <span class="route-path">${pathHtml}</span>
+        <span class="route-desc">${route.desc}</span>
+        <span class="route-expand-icon">▼</span>
+      </div>
+      <div class="route-card-body">
+        ${paramsHtml}
+        ${bodyHtml}
+        <div class="action-bar">
+          <button class="${btnClass}" onclick="sendRequest('${id}', '${route.method}', '${route.path}')">
+            ▶ Send
+          </button>
+          <div class="response-meta" id="${id}-meta" style="display:none">
+            <span class="response-status" id="${id}-status"></span>
+            <span class="response-time" id="${id}-time"></span>
+          </div>
+        </div>
+        <div class="response-viewer" id="${id}-viewer" style="display:none">
+          <div class="response-viewer-header">
+            <span>Response</span>
+            <button class="btn-copy" onclick="copyResponse('${id}')">Copy</button>
+          </div>
+          <div class="response-body" id="${id}-body">
+            <div class="empty-response">
+              <div class="icon">📡</div>
+              Click <strong>Send</strong> to see the response
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    section.appendChild(card);
+  });
+
+  container.appendChild(section);
+});
+
+// =========================================================================
+//  INTERACTIONS
+// =========================================================================
+function toggleCard(id) {
+  document.getElementById(id).classList.toggle("expanded");
+}
+
+function getBaseUrl() {
+  return document.getElementById("baseUrl").value.replace(/\/+$/, "");
+}
+
+async function sendRequest(id, method, pathTemplate) {
+  const card = document.getElementById(id);
+  const btn = card.querySelector(".btn-send");
+  const viewer = document.getElementById(`${id}-viewer`);
+  const bodyEl = document.getElementById(`${id}-body`);
+  const metaEl = document.getElementById(`${id}-meta`);
+  const statusEl = document.getElementById(`${id}-status`);
+  const timeEl = document.getElementById(`${id}-time`);
+
+  // Resolve path params
+  let resolvedPath = pathTemplate;
+  const pathInputs = card.querySelectorAll('input[data-ispath="true"]');
+  pathInputs.forEach(inp => {
+    const paramName = inp.dataset.param;
+    const value = inp.value.trim() || inp.placeholder;
+    resolvedPath = resolvedPath.replace(paramName, value);
+  });
+
+  // Collect query params
+  const queryInputs = card.querySelectorAll('input[data-ispath="false"]');
+  const queryParts = [];
+  queryInputs.forEach(inp => {
+    const val = inp.value.trim();
+    if (val) {
+      queryParts.push(`${encodeURIComponent(inp.dataset.param)}=${encodeURIComponent(val)}`);
+    }
+  });
+
+  let url = getBaseUrl() + resolvedPath;
+  if (queryParts.length > 0) {
+    url += "?" + queryParts.join("&");
+  }
+
+  // Collect body
+  let bodyPayload = undefined;
+  const textarea = card.querySelector('textarea[data-body="true"]');
+  if (textarea && (method === "POST" || method === "PATCH" || method === "PUT")) {
+    try {
+      bodyPayload = textarea.value;
+    } catch (_) { /* use raw */ }
+  }
+
+  // UI: loading state
+  btn.classList.add("loading");
+  btn.innerHTML = "Sending…";
+  viewer.style.display = "block";
+  bodyEl.innerHTML = '<div class="empty-response"><div class="icon">⏳</div>Loading…</div>';
+  metaEl.style.display = "none";
+
+  const t0 = performance.now();
+
+  try {
+    const fetchOpts = {
+      method,
+      headers: { "Content-Type": "application/json" }
+    };
+    if (bodyPayload && method !== "GET" && method !== "DELETE") {
+      fetchOpts.body = bodyPayload;
+    }
+
+    const res = await fetch(url, fetchOpts);
+    const elapsed = Math.round(performance.now() - t0);
+
+    let data;
+    const contentType = res.headers.get("content-type") || "";
+    if (contentType.includes("json")) {
+      data = await res.json();
+    } else {
+      data = await res.text();
+    }
+
+    // Status badge
+    metaEl.style.display = "flex";
+    statusEl.textContent = `${res.status} ${res.statusText}`;
+    statusEl.className = "response-status";
+    if (res.status >= 200 && res.status < 300) statusEl.classList.add("status-2xx");
+    else if (res.status >= 400 && res.status < 500) statusEl.classList.add("status-4xx");
+    else if (res.status >= 500) statusEl.classList.add("status-5xx");
+
+    timeEl.textContent = `${elapsed}ms`;
+
+    // Render
+    if (typeof data === "object") {
+      bodyEl.innerHTML = syntaxHighlight(JSON.stringify(data, null, 2));
+    } else {
+      bodyEl.textContent = data;
+    }
+
+    // Store raw for copy
+    bodyEl.dataset.raw = typeof data === "object" ? JSON.stringify(data, null, 2) : data;
+
+  } catch (err) {
+    metaEl.style.display = "flex";
+    statusEl.textContent = "Error";
+    statusEl.className = "response-status status-5xx";
+    timeEl.textContent = "";
+    bodyEl.innerHTML = `<span style="color:var(--rose-400)">${escapeHtml(err.message)}</span>`;
+    bodyEl.dataset.raw = err.message;
+  }
+
+  btn.classList.remove("loading");
+  btn.innerHTML = "▶ Send";
+}
+
+function copyResponse(id) {
+  const bodyEl = document.getElementById(`${id}-body`);
+  const raw = bodyEl.dataset.raw || bodyEl.textContent;
+  navigator.clipboard.writeText(raw).then(() => {
+    const btn = bodyEl.closest(".response-viewer").querySelector(".btn-copy");
+    btn.textContent = "Copied!";
+    setTimeout(() => btn.textContent = "Copy", 1500);
+  });
+}
+
+// =========================================================================
+//  JSON SYNTAX HIGHLIGHTING
+// =========================================================================
+function syntaxHighlight(json) {
+  json = escapeHtml(json);
+  return json.replace(
+    /("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?|\bnull\b)/g,
+    function(match) {
+      let cls = "json-number";
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) {
+          cls = "json-key";
+        } else {
+          cls = "json-string";
+        }
+      } else if (/true|false/.test(match)) {
+        cls = "json-boolean";
+      } else if (/null/.test(match)) {
+        cls = "json-null";
+      }
+      return `<span class="${cls}">${match}</span>`;
+    }
+  );
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// =========================================================================
+//  SCROLL TO TOP
+// =========================================================================
+const scrollBtn = document.getElementById("scrollTopBtn");
+window.addEventListener("scroll", () => {
+  scrollBtn.classList.toggle("visible", window.scrollY > 400);
+});
+scrollBtn.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+</script>
+
+</body>
+</html>

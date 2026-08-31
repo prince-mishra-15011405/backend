@@ -1,0 +1,2687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Airfare Index | Domestic Price Intelligence & CPI Augmentation (India)</title>
+  <meta name="description" content="Real-time India Airfare Price Index with CPI augmentation, inflation nowcasting, and domestic route intelligence.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg-base: #040711;
+      --bg-primary: #080d1a;
+      --bg-card: rgba(13, 20, 36, 0.78);
+      --bg-card-hover: rgba(22, 34, 60, 0.9);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(6, 182, 212, 0.35);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --cyan-400: #22d3ee;
+      --cyan-500: #06b6d4;
+      --cyan-glow: rgba(6, 182, 212, 0.4);
+      --indigo-400: #818cf8;
+      --indigo-500: #6366f1;
+      --emerald-400: #34d399;
+      --emerald-500: #10b981;
+      --rose-400: #fb7185;
+      --rose-500: #f43f5e;
+      --amber-400: #fbbf24;
+      --card-radius: 16px;
+      --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.5;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(ellipse at 15% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 45%),
+        radial-gradient(ellipse at 85% 15%, rgba(99, 102, 241, 0.12) 0px, transparent 40%),
+        radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.06) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* ── Navbar ── */
+    .navbar {
+      background: rgba(8, 13, 26, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky; top: 0; z-index: 100;
+      padding: 12px 24px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .brand-section { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+    .brand-icon-box {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #6366f1 100%);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 16px var(--cyan-glow);
+    }
+    .brand-icon-box svg { width: 22px; height: 22px; fill: #fff; }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-title-row { display: flex; align-items: center; gap: 8px; }
+    .brand-title { font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 800; letter-spacing: 0.04em; color: #fff; text-transform: uppercase; }
+    .brand-badge { background: rgba(6,182,212,0.18); border: 1px solid rgba(6,182,212,0.5); color: var(--cyan-400); font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; letter-spacing: 0.05em; }
+    .brand-subtitle { font-size: 0.68rem; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; }
+
+    /* ── Nav Capsule ── */
+    .nav-capsule { display: flex; align-items: center; background: rgba(13,20,36,0.9); border: 1px solid var(--border-subtle); border-radius: 30px; padding: 4px; gap: 2px; }
+    .nav-btn { background: transparent; border: none; color: var(--text-secondary); padding: 8px 14px; border-radius: 24px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: var(--transition); }
+    .nav-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    .nav-btn.active { background: rgba(6,182,212,0.2); border: 1px solid rgba(6,182,212,0.5); color: var(--cyan-400); box-shadow: 0 0 12px rgba(6,182,212,0.25); }
+    .nav-badge-alert { background: var(--rose-500); color: #fff; font-size: 0.65rem; font-weight: 800; padding: 1px 6px; border-radius: 10px; }
+
+    /* ── Top Right Stats ── */
+    .nav-stats { display: flex; align-items: center; gap: 14px; }
+    .live-index-pill { display: flex; align-items: center; gap: 8px; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.35); padding: 6px 12px; border-radius: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 700; color: var(--emerald-400); }
+    .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--emerald-400); box-shadow: 0 0 8px var(--emerald-400); animation: pulse 1.8s infinite; }
+    @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.8; } 50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 14px var(--emerald-400); } 100% { transform: scale(0.95); opacity: 0.8; } }
+    .utc-clock { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--text-muted); font-weight: 500; }
+
+    /* ── Main Container ── */
+    .main-container { max-width: 1400px; margin: 0 auto; padding: 24px 24px 60px; }
+
+    /* ── Breadcrumbs & Search ── */
+    .top-controls-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+    .breadcrumb-row { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .breadcrumb-link { color: var(--cyan-400); text-decoration: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+    .breadcrumb-link:hover { text-decoration: underline; }
+    .search-group { position: relative; display: flex; align-items: center; gap: 8px; }
+    .search-input-box { position: relative; width: 340px; }
+    .search-input { width: 100%; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 10px 14px 10px 38px; color: #fff; font-size: 0.85rem; outline: none; transition: var(--transition); }
+    .search-input:focus { border-color: var(--cyan-500); box-shadow: 0 0 16px var(--cyan-glow); }
+    .search-icon-svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+    .search-btn { background: linear-gradient(135deg, var(--cyan-500) 0%, var(--indigo-500) 100%); border: none; color: #fff; padding: 10px 18px; border-radius: 12px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px; }
+    .search-btn:hover { box-shadow: 0 0 18px var(--cyan-glow); transform: translateY(-1px); }
+    .search-dropdown { position: absolute; top: calc(100% + 8px); left: 0; right: 0; background: #0c1427; border: 1px solid var(--border-accent); border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,0.6); z-index: 50; display: none; max-height: 280px; overflow-y: auto; }
+    .search-dropdown.active { display: block; }
+    .search-result-item { padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer; transition: var(--transition); }
+    .search-result-item:hover { background: rgba(6,182,212,0.12); }
+
+    /* ── Route Header Card ── */
+    .route-header-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--card-radius); padding: 28px 32px; margin-bottom: 24px; position: relative; overflow: hidden; }
+    .route-header-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(180deg, var(--cyan-400) 0%, var(--indigo-500) 100%); }
+    .route-header-card.cpi-header::before { background: linear-gradient(180deg, var(--indigo-400) 0%, #a855f7 100%); }
+    .route-header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .route-meta-tags { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .route-pill-code { background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.4); color: var(--cyan-400); font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.75rem; padding: 3px 10px; border-radius: 6px; letter-spacing: 0.05em; }
+    .route-pill-corridor { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .route-main-title { font-family: 'Outfit', sans-serif; font-size: 2.3rem; font-weight: 800; letter-spacing: -0.02em; color: #fff; display: flex; align-items: center; gap: 14px; margin-bottom: 8px; flex-wrap: wrap; }
+    .route-main-title span.arrow { color: var(--cyan-400); font-weight: 400; }
+    .route-details-row { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; font-size: 0.85rem; color: var(--text-secondary); }
+    .route-details-row span.bullet { color: var(--text-muted); }
+    .route-details-row strong { color: #fff; }
+    .route-details-row .highlight-cyan { color: var(--cyan-400); font-weight: 600; }
+    .action-btn-3d { background: transparent; border: 1px solid rgba(6,182,212,0.5); color: var(--cyan-400); padding: 10px 20px; border-radius: 10px; font-size: 0.82rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: var(--transition); text-transform: uppercase; letter-spacing: 0.05em; }
+    .action-btn-3d:hover { background: rgba(6,182,212,0.15); box-shadow: 0 0 20px var(--cyan-glow); transform: translateY(-2px); }
+
+    /* ── KPI Metric Cards ── */
+    .kpi-cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .kpi-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--card-radius); padding: 20px 22px; transition: var(--transition); position: relative; }
+    .kpi-card:hover { border-color: rgba(6,182,212,0.3); transform: translateY(-2px); }
+    .kpi-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 8px; }
+    .kpi-value { font-family: 'JetBrains Mono', monospace; font-size: 1.7rem; font-weight: 800; color: #fff; margin-bottom: 4px; letter-spacing: -0.02em; }
+    .kpi-value.cyan { color: var(--cyan-400); }
+    .kpi-value.indigo { color: var(--indigo-400); }
+    .kpi-value.positive { color: var(--rose-400); }
+    .kpi-value.negative { color: var(--emerald-400); }
+    .kpi-subtext { font-size: 0.75rem; color: var(--text-muted); }
+    .kpi-value.loading { color: var(--text-muted); font-size: 1rem; animation: shimmer 1.5s infinite; }
+    @keyframes shimmer { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+    /* ── Chart Card ── */
+    .chart-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--card-radius); padding: 28px 32px; margin-bottom: 24px; }
+    .chart-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+    .chart-card-title-group { display: flex; flex-direction: column; gap: 4px; }
+    .chart-card-title { font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px; }
+    .chart-card-title svg { color: var(--cyan-400); }
+    .chart-card-subtitle { font-size: 0.82rem; color: var(--text-muted); }
+    .time-selector { display: flex; background: rgba(8,13,26,0.9); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 3px; gap: 3px; }
+    .time-btn { background: transparent; border: none; color: var(--text-secondary); padding: 6px 14px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: var(--transition); }
+    .time-btn:hover { color: #fff; }
+    .time-btn.active { background: var(--cyan-500); color: #040711; font-weight: 800; }
+    .chart-container-box { width: 100%; height: 380px; position: relative; }
+
+    /* ── Quick Routes ── */
+    .quick-routes-row { display: flex; align-items: center; gap: 8px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 24px; scrollbar-width: thin; }
+    .quick-route-pill { background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-secondary); padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: var(--transition); display: flex; align-items: center; gap: 6px; }
+    .quick-route-pill:hover { border-color: var(--cyan-500); color: #fff; background: rgba(6,182,212,0.1); }
+    .quick-route-pill.active { background: rgba(6,182,212,0.2); border-color: var(--cyan-400); color: var(--cyan-400); }
+
+    /* ── Data Table ── */
+    .data-table-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--card-radius); padding: 24px; margin-bottom: 24px; }
+    .table-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+    .table-title { font-size: 1.05rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
+    .custom-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+    .custom-table th { text-align: left; padding: 12px 16px; color: var(--text-muted); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid var(--border-subtle); }
+    .custom-table td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text-primary); }
+    .custom-table tr:hover td { background: rgba(255,255,255,0.02); cursor: pointer; }
+    .route-badge-cell { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--cyan-400); }
+    .price-cell { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #fff; }
+    .tag-badge.airindia { background: rgba(244,63,94,0.18); color: #fb7185; border: 1px solid rgba(244,63,94,0.4); }
+    .tag-badge.agoda { background: rgba(6,182,212,0.18); color: var(--cyan-400); border: 1px solid rgba(6,182,212,0.4); }
+    .tag-badge.irctc { background: rgba(16,185,129,0.18); color: var(--emerald-400); border: 1px solid rgba(16,185,129,0.4); }
+    .tag-badge.indigo { background: rgba(59,130,246,0.18); color: #60a5fa; border: 1px solid rgba(59,130,246,0.4); }
+    .tag-badge.akasa { background: rgba(249,115,22,0.18); color: #fb923c; border: 1px solid rgba(249,115,22,0.4); }
+    .tag-badge.spicejet { background: rgba(245,158,11,0.18); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4); }
+    .tag-badge.unknown { background: rgba(148,163,184,0.18); color: #94a3b8; border: 1px solid rgba(148,163,184,0.4); }
+
+    /* ── Table Toolbar & Filters ── */
+    .table-toolbar-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .table-filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .table-search-input {
+      background: rgba(8, 13, 26, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 6px 12px 6px 30px;
+      color: #fff;
+      font-size: 0.8rem;
+      outline: none;
+      transition: var(--transition);
+      width: 200px;
+    }
+    .table-search-input:focus {
+      border-color: var(--cyan-400);
+      width: 240px;
+    }
+    .table-search-wrap {
+      position: relative;
+      display: inline-block;
+    }
+    .table-search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      pointer-events: none;
+    }
+    .table-select-ctrl {
+      background: rgba(8, 13, 26, 0.85);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+    .table-select-ctrl:focus {
+      border-color: var(--cyan-400);
+    }
+
+    /* ── Pagination Controls ── */
+    .pagination-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .pagination-info {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .pagination-btns {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .page-nav-btn {
+      background: rgba(13, 20, 36, 0.85);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .page-nav-btn:hover:not(:disabled) {
+      background: rgba(6, 182, 212, 0.18);
+      border-color: var(--cyan-400);
+      color: #fff;
+    }
+    .page-nav-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+    .page-num-btn {
+      background: rgba(13, 20, 36, 0.85);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      min-width: 32px;
+      height: 32px;
+      padding: 0 6px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .page-num-btn:hover {
+      border-color: var(--cyan-400);
+      color: #fff;
+    }
+    .page-num-btn.active {
+      background: var(--cyan-500);
+      border-color: var(--cyan-400);
+      color: #040711;
+      font-weight: 800;
+      box-shadow: 0 0 12px var(--cyan-glow);
+    }
+
+    /* ── Multi-Provider Price Comparison Card ── */
+    .comparison-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--card-radius);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .comparison-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 4px; height: 100%;
+      background: linear-gradient(180deg, #f97316 0%, #fb7185 50%, var(--cyan-400) 100%);
+    }
+    .comparison-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .comparison-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .comparison-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .comparison-providers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .provider-box {
+      background: rgba(8, 13, 26, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 18px 20px;
+      position: relative;
+      transition: var(--transition);
+    }
+    .provider-box:hover {
+      border-color: rgba(6, 182, 212, 0.4);
+      transform: translateY(-2px);
+    }
+    .provider-box.winner {
+      border: 1px solid rgba(52, 211, 153, 0.6);
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.08) 0%, rgba(8, 13, 26, 0.95) 100%);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+    }
+    .provider-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .provider-airline-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .winner-badge {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(16, 185, 129, 0.6);
+      color: var(--emerald-400);
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      animation: pulse 2s infinite;
+    }
+    .provider-main-fare {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+    .provider-fare-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .provider-stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .p-stat-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+    .p-stat-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .spread-arbitrage-banner {
+      background: rgba(13, 20, 36, 0.9);
+      border: 1px solid var(--border-accent);
+      border-radius: 12px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .spread-text {
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .spread-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--emerald-400);
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .carrier-filter-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .carrier-pill-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .carrier-pill-btn:hover {
+      background: rgba(6, 182, 212, 0.12);
+      color: #fff;
+    }
+    .carrier-pill-btn.active {
+      background: rgba(6, 182, 212, 0.22);
+      border-color: var(--cyan-400);
+      color: var(--cyan-400);
+    }
+
+    /* ── Simulator ── */
+    .simulator-box { background: rgba(8,13,26,0.95); border: 1px solid var(--border-accent); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+    .simulator-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+    .shock-pill-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle); color: var(--text-secondary); padding: 6px 12px; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: var(--transition); }
+    .shock-pill-btn:hover { background: rgba(6,182,212,0.15); border-color: var(--cyan-500); color: #fff; }
+    .shock-pill-btn.active { background: var(--cyan-500); color: #040711; border-color: var(--cyan-400); }
+    .sim-value-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
+    .sim-value-number { font-family: 'JetBrains Mono'; font-size: 1.4rem; font-weight: 800; }
+
+    /* ── Loading Overlay ── */
+    .loading-overlay { position: fixed; inset: 0; background: rgba(4,7,17,0.75); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; flex-direction: column; gap: 16px; z-index: 1000; }
+    .loading-overlay.active { display: flex; }
+    .spinner-ring { width: 52px; height: 52px; border: 4px solid rgba(6,182,212,0.15); border-top-color: var(--cyan-400); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .loading-subtext { font-size: 0.82rem; color: var(--cyan-400); font-family: 'JetBrains Mono', monospace; }
+
+    /* ── Toast ── */
+    .toast-msg { position: fixed; bottom: 24px; right: 24px; background: #0f172a; border: 1px solid var(--border-accent); color: #fff; padding: 12px 20px; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); font-size: 0.85rem; font-weight: 600; display: none; z-index: 2000; }
+    .toast-msg.show { display: block; animation: fadeInUp 0.3s ease; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── Empty State ── */
+    .empty-state { text-align: center; padding: 48px 24px; color: var(--text-muted); }
+    .empty-state-icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.5; }
+    .empty-state-title { font-size: 1.1rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .route-main-title { font-size: 1.6rem; }
+      .navbar { flex-direction: column; align-items: stretch; }
+      .nav-capsule { overflow-x: auto; }
+      .search-input-box { width: 100%; }
+    }
+
+    /* ── API Explorer Styles ── */
+    .api-explorer-header { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--card-radius); padding: 24px 28px; margin-bottom: 24px; position: relative; overflow: hidden; }
+    .api-explorer-header::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(180deg, var(--emerald-400) 0%, var(--cyan-400) 100%); }
+    .api-status-banner { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 24px; }
+    .api-status-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px 20px; transition: var(--transition); }
+    .api-status-card:hover { border-color: rgba(6,182,212,0.3); transform: translateY(-2px); }
+    .api-cat-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .api-cat-btn { background: rgba(13,20,36,0.85); border: 1px solid var(--border-subtle); color: var(--text-secondary); padding: 7px 16px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: var(--transition); }
+    .api-cat-btn:hover { border-color: var(--cyan-500); color: #fff; }
+    .api-cat-btn.active { background: rgba(6,182,212,0.2); border-color: var(--cyan-400); color: var(--cyan-400); }
+    .api-route-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; margin-bottom: 14px; overflow: hidden; transition: var(--transition); backdrop-filter: blur(12px); }
+    .api-route-card:hover { border-color: rgba(6,182,212,0.35); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+    .api-route-header { display: flex; align-items: center; gap: 12px; padding: 14px 20px; cursor: pointer; user-select: none; transition: background var(--transition); }
+    .api-route-header:hover { background: rgba(255,255,255,0.02); }
+    .method-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 800; padding: 4px 10px; border-radius: 6px; min-width: 60px; text-align: center; }
+    .method-GET { background: rgba(52,211,153,0.14); color: var(--emerald-400); border: 1px solid rgba(52,211,153,0.3); }
+    .method-POST { background: rgba(99,102,241,0.14); color: var(--indigo-400); border: 1px solid rgba(99,102,241,0.3); }
+    .method-PATCH { background: rgba(251,191,36,0.14); color: var(--amber-400); border: 1px solid rgba(251,191,36,0.3); }
+    .method-DELETE { background: rgba(251,113,133,0.14); color: var(--rose-400); border: 1px solid rgba(251,113,133,0.3); }
+    .api-path-text { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; font-weight: 600; color: #fff; flex: 1; }
+    .api-desc-text { font-size: 0.8rem; color: var(--text-muted); margin-left: auto; max-width: 450px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .api-route-body { padding: 0 20px 20px; border-top: 1px solid rgba(255,255,255,0.04); display: none; }
+    .api-route-body.open { display: block; padding-top: 16px; }
+    .api-param-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 14px; }
+    .api-param-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .api-param-input { width: 100%; background: #080d1a; border: 1px solid var(--border-subtle); border-radius: 8px; padding: 8px 12px; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; outline: none; transition: var(--transition); }
+    .api-param-input:focus { border-color: var(--cyan-400); }
+    .api-body-textarea { width: 100%; background: #080d1a; border: 1px solid var(--border-subtle); border-radius: 8px; padding: 10px 12px; color: var(--cyan-400); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; height: 100px; resize: vertical; outline: none; margin-bottom: 12px; }
+    .api-controls-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+    .btn-send-api { background: linear-gradient(135deg, var(--cyan-500) 0%, var(--indigo-500) 100%); border: none; color: #fff; padding: 8px 18px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: var(--transition); }
+    .btn-send-api:hover { box-shadow: 0 0 16px var(--cyan-glow); transform: translateY(-1px); }
+    .btn-send-api.loading { opacity: 0.6; pointer-events: none; }
+    .api-resp-meta { display: flex; align-items: center; gap: 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
+    .api-status-badge { padding: 2px 8px; border-radius: 4px; font-weight: 700; }
+    .api-status-2xx { background: rgba(52,211,153,0.15); color: var(--emerald-400); border: 1px solid rgba(52,211,153,0.3); }
+    .api-status-4xx { background: rgba(251,191,36,0.15); color: var(--amber-400); border: 1px solid rgba(251,191,36,0.3); }
+    .api-status-5xx { background: rgba(251,113,133,0.15); color: var(--rose-400); border: 1px solid rgba(251,113,133,0.3); }
+    .btn-copy-resp { background: transparent; border: 1px solid var(--border-subtle); color: var(--text-muted); padding: 3px 8px; border-radius: 4px; font-size: 0.72rem; cursor: pointer; transition: var(--transition); }
+    .btn-copy-resp:hover { color: var(--cyan-400); border-color: var(--border-accent); }
+    .api-resp-pre { background: #060a14; border: 1px solid var(--border-subtle); border-radius: 8px; padding: 12px 14px; max-height: 320px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #94a3b8; white-space: pre-wrap; word-break: break-all; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <nav class="navbar">
+    <div class="brand-section" onclick="switchView('dashboard')">
+      <div class="brand-icon-box">
+        <svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-title-row">
+          <div class="brand-title">Airfare Index</div>
+          <div class="brand-badge">INDIA</div>
+        </div>
+        <div class="brand-subtitle">Domestic Price Intelligence</div>
+      </div>
+    </div>
+
+    <div class="nav-capsule">
+      <button class="nav-btn" id="navHomeBtn" onclick="switchView('home')">🧭 Home</button>
+      <button class="nav-btn" id="navDashBtn" onclick="switchView('dashboard')">🎛️ Dashboard</button>
+      <button class="nav-btn active" id="navRoutesBtn" onclick="switchView('routes')">🔀 Routes</button>
+      <button class="nav-btn" id="navCpiBtn" onclick="switchView('cpi')">📊 CPI Intelligence</button>
+      <button class="nav-btn" id="navMapBtn" onclick="switchView('map')">📍 India Map</button>
+      <button class="nav-btn" id="navAnomalyBtn" onclick="switchView('anomalies')">⚠️ Anomalies <span class="nav-badge-alert" id="anomalyCountBadge">—</span></button>
+      <button class="nav-btn" id="navExplorerBtn" onclick="switchView('explorer')">🗄️ Data Explorer</button>
+      <button class="nav-btn" id="navApiBtn" onclick="switchView('api')">⚡ API Explorer</button>
+      <button class="nav-btn" id="navMethodBtn" onclick="switchView('methodology')">📖 Methodology</button>
+    </div>
+
+    <div class="nav-stats">
+      <div class="live-index-pill">
+        <div class="pulse-dot"></div>
+        <span>INDEX <strong id="topNavIndexVal">—</strong> <span id="topNavIndexChange" style="color: var(--text-muted);">—</span></span>
+      </div>
+      <div class="utc-clock" id="liveUtcClock">--:--:-- UTC</div>
+    </div>
+  </nav>
+
+  <main class="main-container">
+
+    <!-- Top Controls Bar -->
+    <div class="top-controls-bar">
+      <div class="breadcrumb-row" id="breadcrumbContainer">
+        <span>← <a class="breadcrumb-link" onclick="switchView('routes')">Routes</a> / <span id="breadcrumbRouteLabel" style="color: #fff;">—</span></span>
+      </div>
+      <div class="search-group">
+        <div class="search-input-box">
+          <svg class="search-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="globalRouteSearch" class="search-input" placeholder="Search route, city, airport (e.g. DEL-GOI)..." autocomplete="off" />
+          <div class="search-dropdown" id="searchDropdown"></div>
+        </div>
+        <button class="search-btn" id="searchSubmitBtn" onclick="triggerSearch()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          Search & Scrape
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Route Pill Filters (populated dynamically) -->
+    <div class="quick-routes-row" id="quickRoutesContainer">
+      <!-- Dynamically populated from /api/routes -->
+    </div>
+
+    <!-- ═══════ ROUTE ANALYTICS SECTION ═══════ -->
+    <section id="routeAnalyticsSection">
+      <div class="route-header-card">
+        <div class="route-header-top">
+          <div>
+            <div class="route-meta-tags">
+              <span class="route-pill-code" id="headerRoutePill">—</span>
+              <span class="route-pill-corridor" id="headerCorridorType">DOMESTIC TRUNK CORRIDOR</span>
+            </div>
+            <h1 class="route-main-title" id="headerRouteTitle">Loading...</h1>
+            <div class="route-details-row" id="headerRouteMeta">
+              <span>Distance: <strong id="metaDistance">—</strong></span>
+              <span class="bullet">•</span>
+              <span>Duration: <strong id="metaDuration">—</strong></span>
+              <span class="bullet">•</span>
+              <span>Frequency: <strong class="highlight-cyan" id="metaFreq">—</strong></span>
+              <span class="bullet">•</span>
+              <span>Route Weight: <strong id="metaWeight">—</strong></span>
+            </div>
+          </div>
+          <button class="action-btn-3d" onclick="switchView('map')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            View on 3D Map
+          </button>
+        </div>
+      </div>
+
+      <!-- 6 KPI Metric Cards -->
+      <div class="kpi-cards-grid">
+        <div class="kpi-card"><div class="kpi-label">Spot Fare</div><div class="kpi-value loading" id="kpiSpotFare">Loading…</div><div class="kpi-subtext">Current median</div></div>
+        <div class="kpi-card"><div class="kpi-label">Base Fare</div><div class="kpi-value loading" id="kpiBaseFare">Loading…</div><div class="kpi-subtext">Benchmark (100 pts)</div></div>
+        <div class="kpi-card"><div class="kpi-label">Route Index</div><div class="kpi-value loading" id="kpiRouteIndex">Loading…</div><div class="kpi-subtext">Indexed score</div></div>
+        <div class="kpi-card"><div class="kpi-label">24h Change</div><div class="kpi-value loading" id="kpi24hChange">Loading…</div><div class="kpi-subtext">Day-over-day</div></div>
+        <div class="kpi-card"><div class="kpi-label">7d Change</div><div class="kpi-value loading" id="kpi7dChange">Loading…</div><div class="kpi-subtext">Weekly delta</div></div>
+        <div class="kpi-card"><div class="kpi-label">30d Average</div><div class="kpi-value loading" id="kpi30dAvg">Loading…</div><div class="kpi-subtext">Historical mean</div></div>
+      </div>
+
+      <!-- Spline Chart -->
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div class="chart-card-title-group">
+            <div class="chart-card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              Corridor Fare History & Volatility Range
+            </div>
+            <div class="chart-card-subtitle" id="chartCardSubtitle">Loading corridor data…</div>
+          </div>
+          <div class="time-selector">
+            <button class="time-btn" onclick="setTimePeriod('7D', this)">7D</button>
+            <button class="time-btn active" onclick="setTimePeriod('30D', this)">30D</button>
+            <button class="time-btn" onclick="setTimePeriod('90D', this)">90D</button>
+          </div>
+        </div>
+        <div class="chart-container-box"><canvas id="corridorFareChart"></canvas></div>
+      </div>
+
+      <!-- Multi-Provider Price Comparison Card -->
+      <div id="priceComparisonCard" class="comparison-card">
+        <div class="comparison-header-row">
+          <div class="comparison-title-group">
+            <div class="comparison-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+              Dynamic Multi-Provider Price Comparison (Air India vs. Agoda vs. IRCTC Air)
+            </div>
+            <span class="winner-badge" id="comparisonLiveBadge">⚡ Live Scraper Active</span>
+          </div>
+          <div class="carrier-filter-container" id="carrierFilterContainer">
+            <!-- Filter pills populated dynamically -->
+          </div>
+        </div>
+
+        <div class="comparison-providers-grid" id="comparisonProvidersGrid">
+          <!-- Provider tiles populated dynamically -->
+        </div>
+
+        <div class="spread-arbitrage-banner" id="spreadArbitrageBanner" style="display: none;">
+          <div class="spread-text" id="spreadArbitrageText">
+            <!-- Dynamic spread comparison -->
+          </div>
+          <div style="font-size: 0.72rem; color: var(--text-muted);" id="spreadComparedAt">
+            Updated live
+          </div>
+        </div>
+      </div>
+
+      <!-- Fare Observations Table with Toolbar & Pagination -->
+      <div class="data-table-card">
+        <div class="table-header-row">
+          <div class="table-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            Live Carrier Fare Observations (<span id="obsCountBadge">0</span> flights captured)
+          </div>
+          <button class="action-btn-3d" style="padding: 6px 12px; font-size: 0.75rem;" onclick="triggerScrapeCurrentRoute()">⚡ Rescrape Route</button>
+        </div>
+
+        <!-- Table Toolbar: Search, Sort, Page Size -->
+        <div class="table-toolbar-row">
+          <div class="table-search-wrap">
+            <span class="table-search-icon">🔍</span>
+            <input type="text" class="table-search-input" id="obsTableSearchInput" placeholder="Filter flights, airlines, times..." oninput="handleObsSearchInput(this.value)" />
+          </div>
+          <div class="table-filter-group">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Sort:</span>
+              <select class="table-select-ctrl" id="obsSortSelect" onchange="handleObsSortChange(this.value)">
+                <option value="date-asc">Departure Date (Earliest)</option>
+                <option value="date-desc">Departure Date (Latest)</option>
+                <option value="price-asc">Price (Lowest First)</option>
+                <option value="price-desc">Price (Highest First)</option>
+                <option value="airline-asc">Airline (A → Z)</option>
+                <option value="duration-asc">Duration (Fastest)</option>
+              </select>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Show:</span>
+              <select class="table-select-ctrl" id="obsPageSizeSelect" onchange="handleObsPageSizeChange(this.value)">
+                <option value="10">10 / page</option>
+                <option value="25" selected>25 / page</option>
+                <option value="50">50 / page</option>
+                <option value="100">100 / page</option>
+                <option value="-1">All flights</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Carrier / Source</th>
+                <th>Flight No</th>
+                <th>Route</th>
+                <th>Departure</th>
+                <th>Arrival</th>
+                <th>Duration & Stops</th>
+                <th>Cabin / Fare</th>
+                <th>Total Fare (INR)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="fareObservationsTableBody">
+              <tr><td colspan="9" class="empty-state"><div class="empty-state-icon">📡</div><div class="empty-state-title">Waiting for data…</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Navigation Bar -->
+        <div class="pagination-bar" id="observationsPaginationBar" style="display: none;">
+          <div class="pagination-info" id="obsPaginationInfo">Showing 0 to 0 of 0 entries</div>
+          <div class="pagination-btns" id="obsPaginationBtns">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ CPI INTELLIGENCE SECTION ═══════ -->
+    <section id="cpiIntelligenceSection" style="display: none;">
+
+      <!-- CPI Header -->
+      <div class="route-header-card cpi-header">
+        <div class="route-header-top">
+          <div>
+            <div class="route-meta-tags">
+              <span class="route-pill-code" style="color: var(--indigo-400); border-color: rgba(99,102,241,0.5); background: rgba(99,102,241,0.15);">MOSPI AUGMENTATION</span>
+              <span class="route-pill-corridor" id="cpiHeaderBadge">Loading…</span>
+            </div>
+            <h1 class="route-main-title">Consumer Price Index (CPI) Augmentation</h1>
+            <div class="route-details-row" id="cpiHeaderMeta">
+              <span>National Transport Basket Weight: <strong id="cpiMetaTransportWeight">—</strong></span>
+              <span class="bullet">•</span>
+              <span>Airfare Effective Weight: <strong id="cpiMetaEffectiveWeight">—</strong></span>
+              <span class="bullet">•</span>
+              <span>Publication Lead Time Advantage: <strong class="highlight-cyan" id="cpiMetaLeadTime">—</strong></span>
+            </div>
+          </div>
+          <button class="action-btn-3d" onclick="loadCpiData()">🔄 Refresh Macro Data</button>
+        </div>
+      </div>
+
+      <!-- CPI KPI Cards -->
+      <div class="kpi-cards-grid">
+        <div class="kpi-card"><div class="kpi-label">Headline CPI Impact</div><div class="kpi-value cyan loading" id="cpiHeadlineBps">Loading…</div><div class="kpi-subtext">All-India Inflation Delta</div></div>
+        <div class="kpi-card"><div class="kpi-label">Transport Group Shift</div><div class="kpi-value indigo loading" id="cpiTransportPct">Loading…</div><div class="kpi-subtext" id="cpiTransportSub">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Airfare Inflation Rate</div><div class="kpi-value positive loading" id="cpiInflationRate">Loading…</div><div class="kpi-subtext">Base Period Benchmark</div></div>
+        <div class="kpi-card"><div class="kpi-label">Nowcast Advantage</div><div class="kpi-value negative loading" id="cpiLeadAdvantage">Loading…</div><div class="kpi-subtext" id="cpiLeadSub">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Urban CPI Impact</div><div class="kpi-value loading" id="cpiUrbanBps">Loading…</div><div class="kpi-subtext">Urban Concentration</div></div>
+        <div class="kpi-card"><div class="kpi-label">Rural CPI Impact</div><div class="kpi-value loading" id="cpiRuralBps">Loading…</div><div class="kpi-subtext">Rural Disaggregation</div></div>
+      </div>
+
+      <!-- Policy Shock Simulator -->
+      <div class="simulator-box">
+        <div class="simulator-header">
+          <div>
+            <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; color: #fff;">⚡ Real-Time Inflation Shock & Policy Simulator</h3>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Simulate macroeconomic headline inflation shifts resulting from hypothetical domestic airfare price shocks.</p>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button class="shock-pill-btn" onclick="applyShock(-30, this)">-30%</button>
+            <button class="shock-pill-btn" onclick="applyShock(-20, this)">-20%</button>
+            <button class="shock-pill-btn" onclick="applyShock(-10, this)">-10%</button>
+            <button class="shock-pill-btn active" onclick="applyShock(0, this)">Base (0%)</button>
+            <button class="shock-pill-btn" onclick="applyShock(10, this)">+10%</button>
+            <button class="shock-pill-btn" onclick="applyShock(20, this)">+20%</button>
+            <button class="shock-pill-btn" onclick="applyShock(30, this)">+30%</button>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.06);">
+          <div><div class="sim-value-label">Simulated Airfare Index</div><div class="sim-value-number" style="color: var(--cyan-400);" id="simAirIndex">—</div></div>
+          <div><div class="sim-value-label">Transport Group Impact</div><div class="sim-value-number" style="color: #fff;" id="simTransportShift">—</div></div>
+          <div><div class="sim-value-label">Headline CPI Shift</div><div class="sim-value-number" style="color: var(--rose-400);" id="simHeadlineBps">—</div></div>
+          <div><div class="sim-value-label">Annualized Impact Rate</div><div class="sim-value-number" style="color: var(--emerald-400);" id="simAnnualRate">—</div></div>
+        </div>
+      </div>
+
+      <!-- CPI Comparison Chart -->
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div class="chart-card-title-group">
+            <div class="chart-card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-6 6"/></svg>
+              Real-Time Airfare Nowcast (T+0) vs Official MOSPI CPI (T+45 Lag)
+            </div>
+            <div class="chart-card-subtitle" id="cpiChartSubtitle">Loading comparison data…</div>
+          </div>
+        </div>
+        <div class="chart-container-box"><canvas id="cpiComparisonChart"></canvas></div>
+      </div>
+
+      <!-- CPI Decomposition Table -->
+      <div class="data-table-card">
+        <div class="table-header-row">
+          <div class="table-title">Corridor Contributions to National CPI Transport Group</div>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Ranked by Headline Inflation Contribution (Basis Points)</span>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="custom-table">
+            <thead><tr><th>Corridor</th><th>Route Name</th><th>Current Fare</th><th>Route Index</th><th>Basket Weight</th><th>Transport Group Impact</th><th>Headline CPI Impact</th><th>Passenger Volume</th></tr></thead>
+            <tbody id="cpiDecompositionTableBody"><tr><td colspan="8" class="empty-state"><div class="empty-state-icon">📊</div><div class="empty-state-title">Loading CPI decomposition…</div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ MASTER ROUTES SECTION ═══════ -->
+    <section id="masterRoutesSection" style="display: none;">
+      <div class="data-table-card">
+        <div class="table-header-row">
+          <div class="table-title">All Tracked Indian Domestic Routes (<span id="allRoutesCount">0</span>)</div>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Click any row to inspect individual route analytics</span>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="custom-table">
+            <thead><tr><th>Route</th><th>Corridor Name</th><th>Current Median Fare</th><th>Base Fare</th><th>Route Index</th><th>24h Change</th><th>7d Change</th><th>Index Weight</th><th>Action</th></tr></thead>
+            <tbody id="allRoutesTableBody"><tr><td colspan="9" class="empty-state"><div class="empty-state-icon">🗺️</div><div class="empty-state-title">Loading routes…</div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ API ROUTES EXPLORER SECTION ═══════ -->
+    <section id="apiExplorerSection" style="display: none;">
+      <!-- Header Card -->
+      <div class="api-explorer-header">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+              <span class="route-pill-code" style="background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.4); color: var(--emerald-400);">REST API V1.0</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">INTERACTIVE ENDPOINT EXPLORER</span>
+            </div>
+            <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; color: #fff;">Airfare Intelligence API Explorer</h2>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px;">Preview and execute all REST API routes live, test on-demand scraping with 30-day horizons, and monitor background tasks.</p>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="action-btn-3d" onclick="refreshApiScraperStatus()">🔄 Refresh Task Status</button>
+            <button class="action-btn-3d" style="border-color: rgba(52,211,153,0.5); color: var(--emerald-400);" onclick="triggerScraperRunDirect()">⚡ Run 30-Day Scrape Cycle</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Background Scraper Task Live Metrics Banner -->
+      <div class="api-status-banner">
+        <div class="api-status-card">
+          <div class="kpi-label">Background Scraper Status</div>
+          <div class="kpi-value cyan" style="font-size: 1.25rem;" id="apiScraperRuntimeStatus">IDLE / READY</div>
+          <div class="kpi-subtext" id="apiScraperLastRun">Last Run: Just now</div>
+        </div>
+        <div class="api-status-card">
+          <div class="kpi-label">24h Task Price Change</div>
+          <div class="kpi-value" style="font-size: 1.25rem;" id="apiScraper24hChange">0.0%</div>
+          <div class="kpi-subtext">Day-over-day background delta</div>
+        </div>
+        <div class="api-status-card">
+          <div class="kpi-label">7d Task Price Change</div>
+          <div class="kpi-value" style="font-size: 1.25rem;" id="apiScraper7dChange">0.0%</div>
+          <div class="kpi-subtext">7-day background delta</div>
+        </div>
+        <div class="api-status-card">
+          <div class="kpi-label">Scraped Observations</div>
+          <div class="kpi-value indigo" style="font-size: 1.25rem;" id="apiScraperObsCount">0</div>
+          <div class="kpi-subtext">Captured in 30-day window</div>
+        </div>
+      </div>
+
+      <!-- Categories Filter Bar -->
+      <div class="api-cat-bar" id="apiCatBar">
+        <button class="api-cat-btn active" onclick="filterApiCategory('all', this)">⚡ All Endpoints (<span id="apiTotalCount">18</span>)</button>
+        <button class="api-cat-btn" onclick="filterApiCategory('system', this)">🫀 System & Health</button>
+        <button class="api-cat-btn" onclick="filterApiCategory('index', this)">📈 Airfare Index</button>
+        <button class="api-cat-btn" onclick="filterApiCategory('dashboard', this)">📊 Dashboard</button>
+        <button class="api-cat-btn" onclick="filterApiCategory('routes', this)">✈️ Routes</button>
+        <button class="api-cat-btn" onclick="filterApiCategory('search', this)">🔍 Search & Scrape</button>
+        <button class="api-cat-btn" onclick="filterApiCategory('data', this)">🗄️ Data & Quality</button>
+        <button class="api-cat-btn" onclick="filterApiCategory('scraper', this)">🤖 Scrapers</button>
+        <button class="api-cat-btn" onclick="filterApiCategory('cpi', this)">🏛️ CPI Macro</button>
+      </div>
+
+      <!-- API Routes Cards List Container -->
+      <div id="apiRoutesCardsContainer"></div>
+    </section>
+
+  </main>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner-ring"></div>
+    <div class="loading-text" id="loadingTitle">Initializing…</div>
+    <div class="loading-subtext" id="loadingSubtitle">Connecting to API</div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-msg" id="toastMsgBox"></div>
+
+  <script>
+    // =========================================================================
+    //  STATE — No hardcoded fares, indices, or counts. All populated from API.
+    // =========================================================================
+    let currentOrigin = null;
+    let currentDestination = null;
+    let currentRouteId = null;
+    let currentPeriod = '30D';
+    let chartInstance = null;
+    let cpiChartInstance = null;
+    let cachedRoutesList = [];       // cache from /api/routes
+    let cachedDashboard = null;      // cache from /api/dashboard
+    let cachedCpiSummary = null;     // cache from /api/cpi
+    let cpiDataLoaded = false;
+
+    // Airport coordinates for distance/duration (static reference, not fares)
+    const AIRPORT_COORDS = {
+      DEL: { name: 'Delhi', lat: 28.56, lon: 77.10 },
+      BOM: { name: 'Mumbai', lat: 19.09, lon: 72.87 },
+      GOI: { name: 'Goa', lat: 15.38, lon: 73.83 },
+      GOX: { name: 'Goa (Mopa)', lat: 15.75, lon: 73.87 },
+      BLR: { name: 'Bengaluru', lat: 13.20, lon: 77.71 },
+      HYD: { name: 'Hyderabad', lat: 17.24, lon: 78.43 },
+      MAA: { name: 'Chennai', lat: 12.99, lon: 80.17 },
+      CCU: { name: 'Kolkata', lat: 22.65, lon: 88.45 },
+      AMD: { name: 'Ahmedabad', lat: 23.07, lon: 72.63 },
+      PNQ: { name: 'Pune', lat: 18.58, lon: 73.92 },
+      COK: { name: 'Kochi', lat: 10.15, lon: 76.40 },
+      JAI: { name: 'Jaipur', lat: 26.82, lon: 75.80 },
+      LKO: { name: 'Lucknow', lat: 26.76, lon: 80.88 },
+      IXC: { name: 'Chandigarh', lat: 30.67, lon: 76.79 },
+      SXR: { name: 'Srinagar', lat: 34.00, lon: 74.77 }
+    };
+
+    // =========================================================================
+    //  UTILITY FUNCTIONS
+    // =========================================================================
+    function haversineKm(c1, c2) {
+      if (!c1 || !c2) return null;
+      const R = 6371, toRad = d => d * Math.PI / 180;
+      const dLat = toRad(c2.lat - c1.lat), dLon = toRad(c2.lon - c1.lon);
+      const a = Math.sin(dLat/2)**2 + Math.cos(toRad(c1.lat)) * Math.cos(toRad(c2.lat)) * Math.sin(dLon/2)**2;
+      return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+    }
+
+    function estimateDuration(km) {
+      if (!km) return '—';
+      const min = Math.round(30 + (km / 750) * 60);
+      return `${Math.floor(min/60)}h ${min%60}m`;
+    }
+
+    function formatINR(val) {
+      if (val === null || val === undefined || isNaN(val)) return '—';
+      return '₹' + Math.round(val).toLocaleString('en-IN');
+    }
+
+    function signedNum(val, decimals, suffix) {
+      if (val === null || val === undefined || isNaN(val)) return '—';
+      const sign = val > 0 ? '+' : '';
+      return `${sign}${val.toFixed(decimals)}${suffix || ''}`;
+    }
+
+    function cityName(code) {
+      return AIRPORT_COORDS[code]?.name || code;
+    }
+
+    function getSourceBadgeClass(source) {
+      if (!source) return 'unknown';
+      const s = source.toLowerCase();
+      if (s.includes('indigo')) return 'indigo';
+      if (s.includes('air india') || s.includes('airindia')) return 'airindia';
+      if (s.includes('spicejet') || s.includes('spice jet') || s.includes('sg')) return 'spicejet';
+      return 'unknown';
+    }
+
+    // ── Live Clock ──
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('liveUtcClock').textContent = now.toUTCString().split(' ')[4] + ' UTC';
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // ── Toast ──
+    function showToast(msg) {
+      const box = document.getElementById('toastMsgBox');
+      box.textContent = msg;
+      box.classList.add('show');
+      setTimeout(() => box.classList.remove('show'), 3500);
+    }
+
+    // ── Loading Overlay ──
+    function showLoading(title, subtitle) {
+      document.getElementById('loadingTitle').textContent = title;
+      document.getElementById('loadingSubtitle').textContent = subtitle || '';
+      document.getElementById('loadingOverlay').classList.add('active');
+    }
+    function hideLoading() {
+      document.getElementById('loadingOverlay').classList.remove('active');
+    }
+
+    // ── Set KPI value with proper styling ──
+    function setKpi(id, value, cssClass) {
+      const el = document.getElementById(id);
+      el.textContent = value;
+      el.classList.remove('loading');
+      if (cssClass) { el.className = 'kpi-value ' + cssClass; }
+    }
+
+    // =========================================================================
+    //  VIEW SWITCHING
+    // =========================================================================
+    function switchView(tab) {
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      const sections = ['routeAnalyticsSection', 'cpiIntelligenceSection', 'masterRoutesSection', 'apiExplorerSection'];
+      sections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+
+      if (tab === 'routes' || tab === 'dashboard' || tab === 'home') {
+        document.getElementById('navRoutesBtn').classList.add('active');
+        document.getElementById('routeAnalyticsSection').style.display = 'block';
+        document.getElementById('breadcrumbContainer').style.display = '';
+        document.getElementById('quickRoutesContainer').style.display = '';
+      } else if (tab === 'cpi') {
+        document.getElementById('navCpiBtn').classList.add('active');
+        document.getElementById('cpiIntelligenceSection').style.display = 'block';
+        document.getElementById('breadcrumbContainer').style.display = 'none';
+        document.getElementById('quickRoutesContainer').style.display = 'none';
+        if (!cpiDataLoaded) loadCpiData();
+      } else if (tab === 'api') {
+        const apiBtn = document.getElementById('navApiBtn');
+        if (apiBtn) apiBtn.classList.add('active');
+        document.getElementById('apiExplorerSection').style.display = 'block';
+        document.getElementById('breadcrumbContainer').style.display = 'none';
+        document.getElementById('quickRoutesContainer').style.display = 'none';
+        initApiExplorer();
+      } else {
+        // map, anomalies, explorer, methodology — show routes list
+        const btnMap = { map: 'navMapBtn', anomalies: 'navAnomalyBtn', explorer: 'navExplorerBtn', methodology: 'navMethodBtn' };
+        const btnId = btnMap[tab];
+        if (btnId) document.getElementById(btnId).classList.add('active');
+        document.getElementById('masterRoutesSection').style.display = 'block';
+        document.getElementById('breadcrumbContainer').style.display = 'none';
+        document.getElementById('quickRoutesContainer').style.display = 'none';
+        renderAllRoutesTable();
+      }
+    }
+
+    // =========================================================================
+    //  QUICK ROUTE PILLS — built from /api/routes data
+    // =========================================================================
+    function renderQuickRoutePills(routes) {
+      const container = document.getElementById('quickRoutesContainer');
+      if (!routes || routes.length === 0) {
+        container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.82rem;">No routes tracked yet. Use Search & Scrape to add routes.</div>';
+        return;
+      }
+      container.innerHTML = routes.slice(0, 10).map(r => {
+        const isActive = currentRouteId && (currentRouteId === r.route || currentRouteId === `${r.origin}-${r.destination}`);
+        return `<div class="quick-route-pill${isActive ? ' active' : ''}" onclick="selectRoute('${r.origin}','${r.destination}')">✈️ ${r.routeName || cityName(r.origin) + ' ↔ ' + cityName(r.destination)} (${r.route})</div>`;
+      }).join('');
+    }
+
+    // =========================================================================
+    //  SELECT ROUTE & LOAD ANALYTICS (fully API-driven)
+    // =========================================================================
+    async function selectRoute(origin, dest) {
+      currentOrigin = origin.toUpperCase();
+      currentDestination = dest.toUpperCase();
+      currentRouteId = `${currentOrigin}-${currentDestination}`;
+
+      // Re-render pills active state
+      document.querySelectorAll('.quick-route-pill').forEach(p => {
+        const txt = p.textContent;
+        p.classList.toggle('active', txt.includes(`${currentOrigin}-${currentDestination}`) || txt.includes(`${currentDestination}-${currentOrigin}`));
+      });
+
+      switchView('routes');
+      await loadRouteAnalytics(currentOrigin, currentDestination);
+    }
+
+    async function loadRouteAnalytics(origin, dest) {
+      const o = origin.toUpperCase(), d = dest.toUpperCase();
+      const oName = cityName(o), dName = cityName(d);
+      const routeKey = `${o}-${d}`;
+
+      // Update header text
+      document.getElementById('breadcrumbRouteLabel').textContent = `${o} → ${d}`;
+      document.getElementById('headerRoutePill').textContent = `${o} ↔ ${d}`;
+      document.getElementById('headerRouteTitle').innerHTML = `${oName} (${o}) <span class="arrow">↔</span> ${dName} (${d})`;
+      document.getElementById('chartCardSubtitle').textContent = `Median observed economy airfare trajectory across all carriers on ${oName} (${o}) ↔ ${dName} (${d}).`;
+
+      // Distance & Duration from coordinates
+      const km = haversineKm(AIRPORT_COORDS[o], AIRPORT_COORDS[d]);
+      document.getElementById('metaDistance').textContent = km ? `${km.toLocaleString()} km` : '—';
+      document.getElementById('metaDuration').textContent = estimateDuration(km);
+
+      // Reset KPIs to loading
+      ['kpiSpotFare','kpiBaseFare','kpiRouteIndex','kpi24hChange','kpi7dChange','kpi30dAvg'].forEach(id => {
+        const el = document.getElementById(id);
+        el.textContent = 'Loading…';
+        el.className = 'kpi-value loading';
+      });
+
+      try {
+        let detailData = null;
+
+        // 1. First try /api/routes/:routeKey
+        let detailRes = await fetch(`/api/routes/${routeKey}`).then(r => r.json()).catch(() => null);
+
+        // 2. Also try reversed route key
+        if (!detailRes || !detailRes.success) {
+          const reversedKey = `${d}-${o}`;
+          const reverseRes = await fetch(`/api/routes/${reversedKey}`).then(r => r.json()).catch(() => null);
+          if (reverseRes && reverseRes.success) detailData = reverseRes.data;
+        } else {
+          detailData = detailRes.data;
+        }
+
+        if (detailData) {
+          populateRouteKPIs(detailData);
+          renderFareChart(detailData);
+          const obs = detailData.fareObservations || [];
+          renderPriceComparison(detailData.priceComparison, obs);
+          renderObservationsTable(obs);
+        } else {
+          // If not in routes detail endpoint, query /api/search which checks DB and streams in background
+          const searchRes = await fetch(`/api/search?q=${o}-${d}&departureDate=2026-09-01`).then(r => r.json()).catch(() => null);
+          if (searchRes && searchRes.success && searchRes.data) {
+            const { observations, priceComparison, routeIndexEngine, sessionId, isScrapingInProgress } = searchRes.data;
+            if (routeIndexEngine) {
+              if (routeIndexEngine.currentRepresentativeFare) setKpi('kpiSpotFare', formatINR(routeIndexEngine.currentRepresentativeFare));
+              if (routeIndexEngine.baseRepresentativeFare) setKpi('kpiBaseFare', formatINR(routeIndexEngine.baseRepresentativeFare));
+              if (routeIndexEngine.routeIndex) setKpi('kpiRouteIndex', routeIndexEngine.routeIndex.toFixed(1));
+            }
+            if (observations && observations.length > 0) {
+              currentRouteObservations = observations;
+              renderPriceComparison(priceComparison, observations);
+              renderFilteredObservationsTable();
+              renderFareChart({ fareObservations: observations });
+            } else {
+              setEmptyRouteState();
+            }
+
+            if (isScrapingInProgress && sessionId) {
+              startPollingSession(sessionId, routeKey);
+            }
+          } else {
+            setEmptyRouteState();
+          }
+        }
+
+        // Update route weight and frequency from cached routes list
+        const routeInfo = cachedRoutesList.find(r => r.route === routeKey || r.route === `${d}-${o}`);
+        if (routeInfo) {
+          document.getElementById('metaWeight').textContent = `${(routeInfo.weight * 100).toFixed(2)}% of Index`;
+          document.getElementById('metaFreq').textContent = `${routeInfo.observations || 0} observations`;
+        } else {
+          document.getElementById('metaWeight').textContent = '—';
+          document.getElementById('metaFreq').textContent = '—';
+        }
+
+      } catch (err) {
+        console.warn('Route analytics error:', err.message);
+        setEmptyRouteState();
+      }
+    }
+
+    function populateRouteKPIs(rd) {
+      const spotFare = rd.currentFare;
+      const baseFare = rd.baseFare;
+      const routeIndex = rd.routeIndex || (baseFare ? (spotFare / baseFare) * 100 : null);
+      const change24h = rd.change24h;
+      const change7d = rd.change7d;
+
+      setKpi('kpiSpotFare', formatINR(spotFare), '');
+      setKpi('kpiBaseFare', formatINR(baseFare), '');
+      setKpi('kpiRouteIndex', routeIndex !== null ? routeIndex.toFixed(1) : '—', 'cyan');
+
+      // 24h Change
+      if (change24h !== null && change24h !== undefined) {
+        setKpi('kpi24hChange', signedNum(change24h, 2, '%'), change24h > 0 ? 'positive' : change24h < 0 ? 'negative' : '');
+      } else {
+        setKpi('kpi24hChange', '+0.0%', '');
+      }
+
+      // 7d Change
+      if (change7d !== null && change7d !== undefined) {
+        setKpi('kpi7dChange', signedNum(change7d, 2, '%'), change7d > 0 ? 'positive' : change7d < 0 ? 'negative' : '');
+      } else {
+        setKpi('kpi7dChange', '+0.0%', '');
+      }
+
+      // 30d Average: compute from fareObservations if available
+      const obs = rd.fareObservations || [];
+      if (obs.length > 0) {
+        const fares = obs.map(o => o.fare || o.totalFare).filter(f => f && f > 0);
+        if (fares.length > 0) {
+          const avg = fares.reduce((s, f) => s + f, 0) / fares.length;
+          setKpi('kpi30dAvg', formatINR(avg), '');
+        } else {
+          setKpi('kpi30dAvg', '—', '');
+        }
+      } else {
+        setKpi('kpi30dAvg', '—', '');
+      }
+    }
+
+    function setEmptyRouteState() {
+      ['kpiSpotFare','kpiBaseFare','kpiRouteIndex','kpi24hChange','kpi7dChange','kpi30dAvg'].forEach(id => setKpi(id, '—', ''));
+      renderPriceComparison(null, []);
+      document.getElementById('fareObservationsTableBody').innerHTML = '<tr><td colspan="9" class="empty-state"><div class="empty-state-icon">📡</div><div class="empty-state-title">No fare data available for this route. Use Search & Scrape to fetch live data.</div></td></tr>';
+      document.getElementById('obsCountBadge').textContent = '0';
+    }
+
+    // =========================================================================
+    //  FARE CHART — uses real fareObservations from API
+    // =========================================================================
+    function renderFareChart(routeData) {
+      const ctx = document.getElementById('corridorFareChart').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      const obs = routeData.fareObservations || [];
+      const historical = routeData.historicalFare || [];
+
+      // Combine historical + live observations into date→fare map
+      const dateMap = new Map();
+      historical.forEach(h => { if (h.date && h.fare) dateMap.set(h.date, h.fare); });
+      obs.forEach(o => { if (o.departureDate && (o.fare || o.totalFare)) dateMap.set(String(o.departureDate).split('T')[0], (o.fare || o.totalFare)); });
+
+      // Sort by date
+      const sortedEntries = [...dateMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+
+      // Apply period filter
+      const maxPoints = currentPeriod === '7D' ? 7 : (currentPeriod === '30D' ? 30 : 90);
+      const sliced = sortedEntries.slice(-maxPoints);
+
+      if (sliced.length === 0) {
+        // No data — show placeholder
+        const canvas = document.getElementById('corridorFareChart');
+        const ctxEmpty = canvas.getContext('2d');
+        ctxEmpty.clearRect(0, 0, canvas.width, canvas.height);
+        ctxEmpty.fillStyle = '#64748b';
+        ctxEmpty.font = '14px Inter';
+        ctxEmpty.textAlign = 'center';
+        ctxEmpty.fillText('No fare history data available', canvas.width / 2, canvas.height / 2);
+        return;
+      }
+
+      const labels = sliced.map(([date]) => date);
+      const dataPoints = sliced.map(([, fare]) => fare);
+
+      const gradient = ctx.createLinearGradient(0, 0, 0, 360);
+      gradient.addColorStop(0, 'rgba(6, 182, 212, 0.38)');
+      gradient.addColorStop(0.5, 'rgba(6, 182, 212, 0.12)');
+      gradient.addColorStop(1, 'rgba(6, 182, 212, 0.0)');
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Observed Fare',
+            data: dataPoints,
+            borderColor: '#22d3ee',
+            borderWidth: 3,
+            tension: 0.45,
+            fill: true,
+            backgroundColor: gradient,
+            pointBackgroundColor: '#22d3ee',
+            pointBorderColor: '#080d1a',
+            pointBorderWidth: 2,
+            pointRadius: dataPoints.length > 30 ? 0 : 4,
+            pointHoverRadius: 6,
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#06b6d4',
+            pointHoverBorderWidth: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(8,13,26,0.95)',
+              titleColor: '#94a3b8', bodyColor: '#fff',
+              borderColor: 'rgba(6,182,212,0.5)', borderWidth: 1, padding: 12, displayColors: false,
+              callbacks: { label: c => 'Fare: ' + formatINR(c.parsed.y) }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255,255,255,0.03)' },
+              ticks: { color: '#64748b', font: { family: "'JetBrains Mono', monospace", size: 10 }, maxTicksLimit: 12 }
+            },
+            y: {
+              grid: { color: 'rgba(255,255,255,0.04)' },
+              ticks: {
+                color: '#64748b',
+                font: { family: "'JetBrains Mono', monospace", size: 11 },
+                callback: val => val >= 1000 ? (val / 1000).toFixed(0) + 'k' : val
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function setTimePeriod(period, btn) {
+      currentPeriod = period;
+      document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      if (currentOrigin && currentDestination) {
+        loadRouteAnalytics(currentOrigin, currentDestination);
+      }
+    }
+
+    // =========================================================================
+    //  DYNAMIC PRICE COMPARISON & FILTERING & PAGINATION
+    // =========================================================================
+    let currentRouteObservations = [];
+    let activeCarrierFilter = 'ALL';
+    let obsSearchQuery = '';
+    let obsSortOption = 'date-asc';
+    let obsCurrentPage = 1;
+    let obsPageSize = 25;
+
+    function getSourceBadgeClass(src) {
+      if (!src) return 'unknown';
+      const s = String(src).toLowerCase();
+      if (s.includes('air india') || s.includes('airindia')) return 'airindia';
+      if (s.includes('agoda')) return 'agoda';
+      if (s.includes('irctc')) return 'irctc';
+      if (s.includes('indigo') || s.includes('6e')) return 'indigo';
+      if (s.includes('akasa')) return 'akasa';
+      if (s.includes('spicejet')) return 'spicejet';
+      return 'unknown';
+    }
+
+    function setCarrierFilter(carrier, btn) {
+      activeCarrierFilter = carrier;
+      obsCurrentPage = 1;
+      document.querySelectorAll('.carrier-pill-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderFilteredObservationsTable();
+    }
+
+    function handleObsSearchInput(val) {
+      obsSearchQuery = (val || '').trim().toLowerCase();
+      obsCurrentPage = 1;
+      renderFilteredObservationsTable();
+    }
+
+    function handleObsSortChange(val) {
+      obsSortOption = val || 'date-asc';
+      renderFilteredObservationsTable();
+    }
+
+    function handleObsPageSizeChange(val) {
+      obsPageSize = parseInt(val, 10);
+      obsCurrentPage = 1;
+      renderFilteredObservationsTable();
+    }
+
+    function changeObsPage(newPage) {
+      obsCurrentPage = newPage;
+      renderFilteredObservationsTable();
+    }
+
+    function renderPriceComparison(compData, observations) {
+      const gridEl = document.getElementById('comparisonProvidersGrid');
+      const bannerEl = document.getElementById('spreadArbitrageBanner');
+      const bannerTextEl = document.getElementById('spreadArbitrageText');
+      const filterEl = document.getElementById('carrierFilterContainer');
+
+      currentRouteObservations = observations || [];
+
+      // Extract per-provider stats either from compData.providers or directly from observations
+      let providers = {};
+      let cheapestName = null;
+
+      if (compData && compData.providers && Object.keys(compData.providers).length > 0) {
+        providers = compData.providers;
+        cheapestName = compData.cheapest;
+      } else if (observations && observations.length > 0) {
+        // Build dynamically from observations
+        const grouped = {};
+        for (const obs of observations) {
+          let src = obs.source || obs.airline || 'Other';
+          if (/irctc/i.test(src)) src = 'IRCTC Air';
+          else if (/agoda/i.test(src)) src = 'Agoda';
+          else if (/air\s*india/i.test(src)) src = 'Air India';
+
+          if (!grouped[src]) grouped[src] = [];
+          const fare = Number(obs.totalFare || obs.fare);
+          if (fare && fare > 0) grouped[src].push(fare);
+        }
+        for (const [src, fares] of Object.entries(grouped)) {
+          fares.sort((a, b) => a - b);
+          const medianVal = fares.length % 2 !== 0 
+            ? fares[Math.floor(fares.length / 2)] 
+            : (fares[fares.length / 2 - 1] + fares[fares.length / 2]) / 2;
+
+          providers[src] = {
+            status: 'ok',
+            observationsCount: fares.length,
+            minFare: fares[0],
+            maxFare: fares[fares.length - 1],
+            medianFare: Math.round(medianVal),
+            meanFare: Number((fares.reduce((a, b) => a + b, 0) / fares.length).toFixed(2))
+          };
+        }
+        const sortedWinners = Object.entries(providers)
+          .filter(([, v]) => v.minFare !== null)
+          .sort(([, a], [, b]) => a.minFare - b.minFare);
+        if (sortedWinners.length > 0) cheapestName = sortedWinners[0][0];
+      }
+
+      // Default providers if none present
+      const providerKeys = Object.keys(providers);
+      if (providerKeys.length === 0) {
+        gridEl.innerHTML = `
+          <div class="provider-box">
+            <div class="provider-top">
+              <div class="provider-airline-name"><span class="tag-badge airindia">Air India</span></div>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Awaiting Scrape</span>
+            </div>
+            <div class="provider-main-fare">—</div>
+            <div class="provider-fare-sub">Lowest Observed Economy Fare</div>
+          </div>
+          <div class="provider-box">
+            <div class="provider-top">
+              <div class="provider-airline-name"><span class="tag-badge agoda">Agoda</span></div>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Awaiting Scrape</span>
+            </div>
+            <div class="provider-main-fare">—</div>
+            <div class="provider-fare-sub">Lowest Observed Economy Fare</div>
+          </div>
+          <div class="provider-box">
+            <div class="provider-top">
+              <div class="provider-airline-name"><span class="tag-badge irctc">IRCTC Air</span></div>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Awaiting Scrape</span>
+            </div>
+            <div class="provider-main-fare">—</div>
+            <div class="provider-fare-sub">Lowest Observed Economy Fare</div>
+          </div>
+        `;
+        bannerEl.style.display = 'none';
+        filterEl.innerHTML = '';
+        return;
+      }
+
+      // Render Provider Cards
+      gridEl.innerHTML = providerKeys.map(name => {
+        const p = providers[name];
+        const isWinner = cheapestName && (name.toLowerCase() === cheapestName.toLowerCase() || (cheapestName.toLowerCase().includes(name.toLowerCase()) || name.toLowerCase().includes(cheapestName.toLowerCase())));
+        const badgeClass = getSourceBadgeClass(name);
+        const minFareStr = p.minFare ? formatINR(p.minFare) : '—';
+        const medianFareStr = p.medianFare ? formatINR(p.medianFare) : '—';
+        const avgFareStr = p.meanFare ? formatINR(p.meanFare) : '—';
+        const count = p.observationsCount || 0;
+
+        return `
+          <div class="provider-box ${isWinner ? 'winner' : ''}">
+            <div class="provider-top">
+              <div class="provider-airline-name">
+                <span class="tag-badge ${badgeClass}">${name}</span>
+              </div>
+              ${isWinner ? '<span class="winner-badge">🏆 CHEAPEST / BEST FARE</span>' : '<span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">● Live Scraped</span>'}
+            </div>
+            <div class="provider-main-fare" style="${isWinner ? 'color: var(--emerald-400);' : ''}">${minFareStr}</div>
+            <div class="provider-fare-sub">Lowest Observed Economy Fare</div>
+            <div class="provider-stats-row">
+              <div>
+                <div class="p-stat-label">Median</div>
+                <div class="p-stat-val">${medianFareStr}</div>
+              </div>
+              <div>
+                <div class="p-stat-label">Average</div>
+                <div class="p-stat-val">${avgFareStr}</div>
+              </div>
+              <div>
+                <div class="p-stat-label">Captured</div>
+                <div class="p-stat-val" style="color: var(--cyan-400);">${count} flights</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Arbitrage / Spread Calculation
+      const validEntries = Object.entries(providers).filter(([, v]) => v.minFare && v.minFare > 0);
+      if (validEntries.length >= 2) {
+        validEntries.sort(([, a], [, b]) => a.minFare - b.minFare);
+        const [cheapName, cheapData] = validEntries[0];
+        const [expName, expData] = validEntries[validEntries.length - 1];
+        const diffInr = expData.minFare - cheapData.minFare;
+        const diffPct = ((diffInr / expData.minFare) * 100).toFixed(1);
+
+        if (diffInr > 0) {
+          bannerTextEl.innerHTML = `
+            <span>⚡ <strong>Price Spread:</strong> <strong style="color: var(--emerald-400);">${cheapName}</strong> offers the lowest entry fare by</span>
+            <span class="spread-tag">₹${diffInr.toLocaleString()} (${diffPct}% lower)</span>
+            <span>compared to ${expName} on this corridor</span>
+          `;
+          bannerEl.style.display = 'flex';
+        } else {
+          bannerTextEl.innerHTML = `<span>⚡ <strong>Price Parity:</strong> All providers are offering equivalent minimum fares at <strong>${formatINR(cheapData.minFare)}</strong>.</span>`;
+          bannerEl.style.display = 'flex';
+        }
+      } else {
+        bannerEl.style.display = 'none';
+      }
+
+      // Render Carrier Filter Pills
+      const totalCount = currentRouteObservations.length;
+      let pillsHtml = `
+        <button class="carrier-pill-btn ${activeCarrierFilter === 'ALL' ? 'active' : ''}" onclick="setCarrierFilter('ALL', this)">
+          All Providers (${totalCount})
+        </button>
+      `;
+      for (const name of providerKeys) {
+        const count = providers[name]?.observationsCount || 0;
+        pillsHtml += `
+          <button class="carrier-pill-btn ${activeCarrierFilter === name ? 'active' : ''}" onclick="setCarrierFilter('${name}', this)">
+            ${name} (${count})
+          </button>
+        `;
+      }
+      filterEl.innerHTML = pillsHtml;
+    }
+
+    // =========================================================================
+    //  OBSERVATIONS TABLE — FILTERING, SORTING & FULL PAGINATION
+    // =========================================================================
+    function renderObservationsTable(observations) {
+      currentRouteObservations = observations || [];
+      activeCarrierFilter = 'ALL';
+      obsSearchQuery = '';
+      obsCurrentPage = 1;
+      const searchInput = document.getElementById('obsTableSearchInput');
+      if (searchInput) searchInput.value = '';
+      renderFilteredObservationsTable();
+    }
+
+    function renderFilteredObservationsTable() {
+      if (!currentRouteObservations) return;
+
+      // 1. Filter by Provider Tab
+      let filtered = currentRouteObservations;
+      if (activeCarrierFilter !== 'ALL') {
+        const match = activeCarrierFilter.toLowerCase();
+        filtered = filtered.filter(o => {
+          const src = (o.source || o.airline || '').toLowerCase();
+          return src.includes(match);
+        });
+      }
+
+      // 2. Filter by Search Query
+      if (obsSearchQuery) {
+        filtered = filtered.filter(o => {
+          const str = `${o.source || ''} ${o.airline || ''} ${o.flightNo || ''} ${o.origin || ''} ${o.destination || ''} ${o.departureTime || ''} ${o.arrivalTime || ''} ${o.duration || ''} ${o.cabinClass || ''} ${o.fareType || ''}`.toLowerCase();
+          return str.includes(obsSearchQuery);
+        });
+      }
+
+      // 3. Sort Observations
+      const sorted = [...filtered];
+      switch (obsSortOption) {
+        case 'date-asc':
+          sorted.sort((a, b) => String(a.departureDate || '').localeCompare(String(b.departureDate || '')) || String(a.departureTime || '').localeCompare(String(b.departureTime || '')));
+          break;
+        case 'date-desc':
+          sorted.sort((a, b) => String(b.departureDate || '').localeCompare(String(a.departureDate || '')) || String(b.departureTime || '').localeCompare(String(a.departureTime || '')));
+          break;
+        case 'price-asc':
+          sorted.sort((a, b) => (Number(a.totalFare || a.fare) || 0) - (Number(b.totalFare || b.fare) || 0));
+          break;
+        case 'price-desc':
+          sorted.sort((a, b) => (Number(b.totalFare || b.fare) || 0) - (Number(a.totalFare || a.fare) || 0));
+          break;
+        case 'airline-asc':
+          sorted.sort((a, b) => String(a.airline || a.source || '').localeCompare(String(b.airline || b.source || '')));
+          break;
+        case 'duration-asc':
+          sorted.sort((a, b) => String(a.duration || '').localeCompare(String(b.duration || '')));
+          break;
+        default:
+          sorted.sort((a, b) => String(a.departureDate || '').localeCompare(String(b.departureDate || '')));
+      }
+
+      const totalItems = sorted.length;
+      document.getElementById('obsCountBadge').textContent = totalItems;
+
+      // 4. Paginate
+      let displayItems = sorted;
+      let totalPages = 1;
+      let startIdx = 0;
+      let endIdx = totalItems;
+
+      if (obsPageSize > 0) {
+        totalPages = Math.max(1, Math.ceil(totalItems / obsPageSize));
+        if (obsCurrentPage > totalPages) obsCurrentPage = totalPages;
+        if (obsCurrentPage < 1) obsCurrentPage = 1;
+
+        startIdx = (obsCurrentPage - 1) * obsPageSize;
+        endIdx = Math.min(startIdx + obsPageSize, totalItems);
+        displayItems = sorted.slice(startIdx, endIdx);
+      }
+
+      // Render Rows
+      renderObservationsRows(displayItems, totalItems === 0);
+
+      // Render Pagination Bar
+      renderPaginationControls(totalItems, startIdx, endIdx, totalPages);
+    }
+
+    function renderObservationsRows(observations, isEmpty) {
+      const tbody = document.getElementById('fareObservationsTableBody');
+
+      if (isEmpty || !observations || observations.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><div class="empty-state-icon">📡</div><div class="empty-state-title">No fare observations match your filter. Click "Rescrape Route" or reset filters.</div></td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = observations.map(obs => {
+        const src = obs.source || obs.airline || 'Unknown';
+        const airline = obs.airline || src;
+        const flightNo = obs.flightNo || '—';
+        const badgeClass = getSourceBadgeClass(src);
+        const depDate = obs.departureDate ? String(obs.departureDate).split('T')[0] : '—';
+        const depTime = obs.departureTime ? obs.departureTime : '';
+        const arrTime = obs.arrivalTime ? obs.arrivalTime : '—';
+        const duration = obs.duration || '—';
+        const stopsText = typeof obs.stops === 'number' 
+          ? (obs.stops === 0 ? 'Non-stop' : `${obs.stops} stop${obs.stops > 1 ? 's' : ''}`)
+          : 'Direct';
+        const cabin = obs.cabinClass || obs.fareType || 'Economy';
+        const fare = obs.fare || obs.totalFare || 0;
+        const orig = obs.origin || currentOrigin || '—';
+        const dest = obs.destination || currentDestination || '—';
+        const baseFare = obs.metadata?.base;
+        const tax = obs.metadata?.tax;
+        const tooltip = baseFare && tax ? `Base: ₹${baseFare} | Tax: ₹${tax}` : `Live fare from ${src}`;
+
+        return `
+          <tr>
+            <td>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span class="tag-badge ${badgeClass}">${src}</span>
+                ${airline !== src ? `<span style="font-size: 0.75rem; color: var(--text-secondary);">${airline}</span>` : ''}
+              </div>
+            </td>
+            <td><strong style="font-family: 'JetBrains Mono'; color: #fff;">${flightNo}</strong></td>
+            <td><span class="route-badge-cell">${orig} → ${dest}</span></td>
+            <td>
+              <div><strong>${depDate}</strong></div>
+              ${depTime ? `<div style="font-size: 0.75rem; color: var(--cyan-400); font-family: 'JetBrains Mono';">${depTime}</div>` : ''}
+            </td>
+            <td>
+              <div><strong style="color: var(--text-secondary);">${arrTime}</strong></div>
+            </td>
+            <td>
+              <div>${duration}</div>
+              <div style="font-size: 0.72rem; color: ${obs.stops === 0 ? 'var(--emerald-400)' : 'var(--amber-400)'}; font-weight: 600;">${stopsText}</div>
+            </td>
+            <td><span style="font-size: 0.78rem; color: var(--text-secondary);">${cabin}</span></td>
+            <td class="price-cell" style="color: var(--cyan-400);" title="${tooltip}">
+              ${formatINR(fare)}
+            </td>
+            <td><span style="color: var(--emerald-400); font-size: 0.75rem; font-weight: 700;">● Live Scraped</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderPaginationControls(totalItems, startIdx, endIdx, totalPages) {
+      const barEl = document.getElementById('observationsPaginationBar');
+      const infoEl = document.getElementById('obsPaginationInfo');
+      const btnsEl = document.getElementById('obsPaginationBtns');
+
+      if (totalItems <= 0 || obsPageSize < 0) {
+        if (totalItems > 0 && obsPageSize < 0) {
+          barEl.style.display = 'flex';
+          infoEl.textContent = `Showing all ${totalItems} observations`;
+          btnsEl.innerHTML = '';
+        } else {
+          barEl.style.display = 'none';
+        }
+        return;
+      }
+
+      barEl.style.display = 'flex';
+      infoEl.textContent = `Showing ${startIdx + 1} to ${endIdx} of ${totalItems} entries`;
+
+      let btnsHtml = `
+        <button class="page-nav-btn" ${obsCurrentPage <= 1 ? 'disabled' : ''} onclick="changeObsPage(${obsCurrentPage - 1})">
+          ◀ Previous
+        </button>
+      `;
+
+      // Render Page Numbers with smart ellipsis
+      const maxButtons = 5;
+      let startPage = Math.max(1, obsCurrentPage - Math.floor(maxButtons / 2));
+      let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+      if (endPage - startPage < maxButtons - 1) {
+        startPage = Math.max(1, endPage - maxButtons + 1);
+      }
+
+      if (startPage > 1) {
+        btnsHtml += `<button class="page-num-btn" onclick="changeObsPage(1)">1</button>`;
+        if (startPage > 2) btnsHtml += `<span style="color: var(--text-muted); padding: 0 4px;">…</span>`;
+      }
+
+      for (let p = startPage; p <= endPage; p++) {
+        btnsHtml += `
+          <button class="page-num-btn ${p === obsCurrentPage ? 'active' : ''}" onclick="changeObsPage(${p})">
+            ${p}
+          </button>
+        `;
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) btnsHtml += `<span style="color: var(--text-muted); padding: 0 4px;">…</span>`;
+        btnsHtml += `<button class="page-num-btn" onclick="changeObsPage(${totalPages})">${totalPages}</button>`;
+      }
+
+      btnsHtml += `
+        <button class="page-nav-btn" ${obsCurrentPage >= totalPages ? 'disabled' : ''} onclick="changeObsPage(${obsCurrentPage + 1})">
+          Next ▶
+        </button>
+      `;
+
+      btnsEl.innerHTML = btnsHtml;
+    }
+
+    // =========================================================================
+    //  CPI INTELLIGENCE — 100% API-driven
+    // =========================================================================
+    async function loadCpiData() {
+      try {
+        const [summaryRes, compRes, decompRes] = await Promise.all([
+          fetch('/api/cpi/summary').then(r => r.json()),
+          fetch('/api/cpi/comparison').then(r => r.json()),
+          fetch('/api/cpi/decomposition').then(r => r.json())
+        ]);
+
+        // ── Summary KPIs ──
+        if (summaryRes.success && summaryRes.data) {
+          const s = summaryRes.data.summary;
+          cachedCpiSummary = s;
+          cpiDataLoaded = true;
+
+          // Header metadata (from API weights)
+          document.getElementById('cpiHeaderBadge').textContent = `BASE ${s.weights?.baseYear || 2012} = 100 • HIGH FREQUENCY MACRO NOWCAST`;
+          document.getElementById('cpiMetaTransportWeight').textContent = `${s.weights?.transportGroupInCpi ?? '—'}%`;
+          document.getElementById('cpiMetaEffectiveWeight').textContent = `${s.effectiveWeightInCpi ?? s.weights?.effectiveTotalWeight ?? '—'}% of All-India CPI`;
+          document.getElementById('cpiMetaLeadTime').textContent = `${s.publicationAdvantage?.leadTimeDays ?? '—'} Days Ahead of MOSPI`;
+
+          // KPI Cards
+          setKpi('cpiHeadlineBps', signedNum(s.headlineCpiImpactBasisPoints, 2, ' bps'), 'cyan');
+          setKpi('cpiTransportPct', signedNum(s.transportCpiImpactPercentagePoints, 2, '%'), 'indigo');
+          setKpi('cpiInflationRate', signedNum(s.airfareInflationRate, 2, '%'), s.airfareInflationRate >= 0 ? 'positive' : 'negative');
+          setKpi('cpiLeadAdvantage', `${s.publicationAdvantage?.leadTimeDays ?? '—'} Days`, 'negative');
+          setKpi('cpiUrbanBps', signedNum(s.urbanImpactBasisPoints, 2, ' bps'), '');
+          setKpi('cpiRuralBps', signedNum(s.ruralImpactBasisPoints, 2, ' bps'), '');
+
+          // Subtexts from API
+          document.getElementById('cpiTransportSub').textContent = `${s.weights?.transportGroupInCpi ?? '—'}% Basket Component`;
+          document.getElementById('cpiLeadSub').textContent = s.publicationAdvantage?.frequency || 'Ahead of Official Release';
+
+          // Simulator baseline values
+          document.getElementById('simAirIndex').textContent = s.indiaAirfareIndex?.toFixed(2) ?? '—';
+          document.getElementById('simTransportShift').textContent = signedNum(s.transportCpiImpactPercentagePoints, 2, '%');
+          document.getElementById('simHeadlineBps').textContent = signedNum(s.headlineCpiImpactBasisPoints, 2, ' bps');
+          document.getElementById('simAnnualRate').textContent = s.headlineCpiImpactBasisPoints != null ? signedNum(s.headlineCpiImpactBasisPoints / 100, 3, '%') : '—';
+        }
+
+        // ── Comparison Chart ──
+        if (compRes.success && compRes.data) {
+          const freq = compRes.data.frequency || '';
+          const lead = compRes.data.leadTimeAdvantageDays || '';
+          document.getElementById('cpiChartSubtitle').textContent = `${freq}${lead ? ' • Lead time: ' + lead + ' days' : ''}`;
+          renderCpiComparisonChart(compRes.data.series || []);
+        }
+
+        // ── Decomposition Table ──
+        if (decompRes.success && decompRes.data) {
+          renderCpiDecompositionTable(decompRes.data.routes || []);
+        }
+
+        showToast('CPI macro data loaded from API');
+      } catch (err) {
+        console.warn('[CPI] Fetch error:', err.message);
+        showToast('Could not load CPI data — check server connection');
+      }
+    }
+
+    function renderCpiComparisonChart(series) {
+      const ctx = document.getElementById('cpiComparisonChart').getContext('2d');
+      if (cpiChartInstance) cpiChartInstance.destroy();
+
+      if (!series || series.length === 0) {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.fillStyle = '#64748b'; ctx.font = '14px Inter'; ctx.textAlign = 'center';
+        ctx.fillText('No comparison data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+        return;
+      }
+
+      cpiChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: series.map(s => s.month),
+          datasets: [
+            {
+              label: 'Real-Time Airfare Nowcast (T+0)',
+              data: series.map(s => s.realTimeNowcast),
+              borderColor: '#22d3ee', backgroundColor: 'rgba(34,211,238,0.1)',
+              borderWidth: 3, tension: 0.35, fill: false,
+              pointRadius: 5, pointHoverRadius: 8, pointBackgroundColor: '#22d3ee'
+            },
+            {
+              label: 'Official MOSPI Air Transport CPI (T+45 Lag)',
+              data: series.map(s => s.airfareCpiOfficial),
+              borderColor: '#f59e0b', borderWidth: 2, borderDash: [6, 6],
+              tension: 0.2, fill: false, pointRadius: 4, pointBackgroundColor: '#f59e0b',
+              spanGaps: true
+            },
+            {
+              label: 'National Headline CPI (All-India)',
+              data: series.map(s => s.generalCpi),
+              borderColor: '#818cf8', borderWidth: 2, tension: 0.2,
+              fill: false, yAxisID: 'y1', pointRadius: 3, pointBackgroundColor: '#818cf8'
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: true, labels: { color: '#94a3b8', font: { family: "'Inter', sans-serif", size: 11 }, boxWidth: 14 } },
+            tooltip: { backgroundColor: 'rgba(8,13,26,0.95)', borderColor: 'rgba(6,182,212,0.5)', borderWidth: 1, padding: 12 }
+          },
+          scales: {
+            x: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#64748b', font: { family: "'JetBrains Mono', monospace", size: 10 } } },
+            y: { position: 'left', title: { display: true, text: 'Airfare Sub-Index (Base 100)', color: '#22d3ee' }, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b', font: { family: "'JetBrains Mono', monospace", size: 10 } } },
+            y1: { position: 'right', title: { display: true, text: 'Headline CPI (2012=100)', color: '#818cf8' }, grid: { drawOnChartArea: false }, ticks: { color: '#818cf8', font: { family: "'JetBrains Mono', monospace", size: 10 } } }
+          }
+        }
+      });
+    }
+
+    function renderCpiDecompositionTable(routes) {
+      const tbody = document.getElementById('cpiDecompositionTableBody');
+      if (!routes || routes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><div class="empty-state-icon">📊</div><div class="empty-state-title">No corridor decomposition data available.</div></td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = routes.map(r => `
+        <tr onclick="selectRoute('${r.origin}','${r.destination}')">
+          <td class="route-badge-cell">${r.route}</td>
+          <td><strong>${r.routeName}</strong></td>
+          <td class="price-cell">${formatINR(r.currentFare)}</td>
+          <td><span style="font-family: 'JetBrains Mono'; font-weight: 700; color: var(--cyan-400);">${r.routeIndex?.toFixed(1) ?? '—'}</span></td>
+          <td>${r.routeWeightInBasket != null ? (r.routeWeightInBasket * 100).toFixed(2) + '%' : '—'}</td>
+          <td>${signedNum(r.transportGroupContributionPct, 3, '%')}</td>
+          <td><strong style="color: var(--rose-400); font-family: 'JetBrains Mono';">${signedNum(r.headlineCpiContributionBps, 2, ' bps')}</strong></td>
+          <td style="color: var(--text-muted);">${(r.passengerVolume || 0).toLocaleString()} pax</td>
+        </tr>
+      `).join('');
+    }
+
+    // ── Shock Simulator — fully API-driven ──
+    async function applyShock(shockPct, btn) {
+      document.querySelectorAll('.shock-pill-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      try {
+        const res = await fetch(`/api/cpi/simulate?shock=${shockPct}`).then(r => r.json());
+        if (res.success && res.data) {
+          const shocks = res.data.shocks || [];
+          if (shocks.length > 0) {
+            const s = shocks[0];
+            document.getElementById('simAirIndex').textContent = s.simulatedAirfareIndex?.toFixed(2) ?? '—';
+            document.getElementById('simTransportShift').textContent = signedNum(s.transportCpiImpactPercentagePoints, 2, '%');
+            document.getElementById('simHeadlineBps').textContent = signedNum(s.headlineCpiImpactBasisPoints, 2, ' bps');
+            document.getElementById('simAnnualRate').textContent = signedNum(s.impliedNationalInflationDelta, 3, '%');
+            showToast(`Applied ${shockPct > 0 ? '+' : ''}${shockPct}% price shock scenario`);
+          }
+        }
+      } catch (e) {
+        showToast('Could not run shock simulation');
+      }
+    }
+
+    // =========================================================================
+    //  SEARCH & PROGRESSIVE POLLING
+    // =========================================================================
+    let activePollingTimer = null;
+
+    function stopPollingSession() {
+      if (activePollingTimer) {
+        clearInterval(activePollingTimer);
+        activePollingTimer = null;
+      }
+    }
+
+    function startPollingSession(sessionId, route) {
+      stopPollingSession();
+      if (!sessionId) return;
+
+      const liveBadge = document.getElementById('comparisonLiveBadge');
+      if (liveBadge) {
+        liveBadge.innerHTML = `⚡ Streaming Live Fares… <span style="display:inline-block; animation: pulse 1s infinite;">●</span>`;
+        liveBadge.style.background = 'rgba(6, 182, 212, 0.25)';
+        liveBadge.style.color = 'var(--cyan-400)';
+      }
+
+      let pollCount = 0;
+      activePollingTimer = setInterval(async () => {
+        pollCount++;
+        try {
+          const pollRes = await fetch(`/api/search/poll?sessionId=${sessionId}&q=${encodeURIComponent(route)}`).then(r => r.json());
+          if (pollRes.success && pollRes.data) {
+            const { observations, priceComparison, routeIndexEngine } = pollRes.data;
+
+            if (observations && observations.length > 0) {
+              currentRouteObservations = observations;
+              renderPriceComparison(priceComparison, observations);
+              renderFilteredObservationsTable();
+            }
+
+            if (routeIndexEngine) {
+              if (routeIndexEngine.currentRepresentativeFare) {
+                setKpi('kpiSpotFare', formatINR(routeIndexEngine.currentRepresentativeFare));
+              }
+              if (routeIndexEngine.baseRepresentativeFare) {
+                setKpi('kpiBaseFare', formatINR(routeIndexEngine.baseRepresentativeFare));
+              }
+              if (routeIndexEngine.routeIndex) {
+                setKpi('kpiRouteIndex', routeIndexEngine.routeIndex.toFixed(2));
+              }
+            }
+
+            if (pollRes.session && pollRes.session.isCompleted) {
+              stopPollingSession();
+              if (liveBadge) {
+                liveBadge.innerHTML = `✅ Scrape Complete (${pollRes.data.observationsCount || 0} flights)`;
+                liveBadge.style.background = 'rgba(16, 185, 129, 0.25)';
+                liveBadge.style.color = 'var(--emerald-400)';
+              }
+              showToast(`Multi-provider sync complete: ${pollRes.data.observationsCount || 0} fares captured across Air India, Agoda & IRCTC!`);
+              await loadRoutesList();
+            }
+          }
+        } catch (err) {
+          console.warn('[POLL] Error polling session:', err.message);
+        }
+
+        // Safety limit: stop polling after 60 ticks (90 seconds)
+        if (pollCount >= 60) {
+          stopPollingSession();
+        }
+      }, 1500);
+    }
+
+    async function triggerSearch() {
+      const q = document.getElementById('globalRouteSearch').value.trim();
+      if (!q) return;
+
+      // Show quick non-blocking feedback
+      showToast(`Searching route "${q}"...`);
+
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&departureDate=2026-09-01`).then(r => r.json());
+
+        if (res.success && res.data) {
+          const { route, observations, priceComparison, routeIndexEngine, sessionId, isScrapingInProgress } = res.data;
+
+          if (route) {
+            const parts = route.split('-');
+            if (parts.length === 2) {
+              currentOrigin = parts[0];
+              currentDestination = parts[1];
+              document.getElementById('routeTitleDisplay').textContent = `${currentOrigin} ↔ ${currentDestination}`;
+              document.getElementById('routeCodeBadge').textContent = `${currentOrigin}-${currentDestination}`;
+            }
+          }
+
+          // Immediately render currently available observations from MongoDB
+          if (observations && observations.length > 0) {
+            currentRouteObservations = observations;
+            renderPriceComparison(priceComparison, observations);
+            renderFilteredObservationsTable();
+          }
+
+          if (routeIndexEngine) {
+            if (routeIndexEngine.currentRepresentativeFare) setKpi('kpiSpotFare', formatINR(routeIndexEngine.currentRepresentativeFare));
+            if (routeIndexEngine.baseRepresentativeFare) setKpi('kpiBaseFare', formatINR(routeIndexEngine.baseRepresentativeFare));
+            if (routeIndexEngine.routeIndex) setKpi('kpiRouteIndex', routeIndexEngine.routeIndex.toFixed(2));
+          }
+
+          // If background scraper is running, start progressive polling
+          if (isScrapingInProgress && sessionId) {
+            showToast(`Streaming live fares in background from Air India, Agoda & IRCTC...`);
+            startPollingSession(sessionId, route || q);
+          } else {
+            showToast(`Loaded ${observations ? observations.length : 0} observations for ${route || q}`);
+          }
+
+          await loadRoutesList();
+        } else {
+          showToast(`Search completed for "${q}"`);
+        }
+      } catch (err) {
+        showToast('Search request failed — check server connection');
+      }
+    }
+
+    async function triggerScrapeCurrentRoute() {
+      if (!currentOrigin || !currentDestination) return;
+      const routeStr = `${currentOrigin}-${currentDestination}`;
+      showToast(`Rescraping ${routeStr} across Air India, Agoda & IRCTC in background…`);
+
+      try {
+        const res = await fetch(`/api/search?q=${routeStr}&rescrape=true&departureDate=2026-09-01`).then(r => r.json());
+        if (res.success && res.data) {
+          const { observations, priceComparison, sessionId, isScrapingInProgress } = res.data;
+
+          if (observations && observations.length > 0) {
+            currentRouteObservations = observations;
+            renderPriceComparison(priceComparison, observations);
+            renderFilteredObservationsTable();
+          }
+
+          if (isScrapingInProgress && sessionId) {
+            startPollingSession(sessionId, routeStr);
+          }
+        }
+      } catch (e) {
+        showToast('Rescrape request failed');
+      }
+    }
+
+    // ── Search Autocomplete ──
+    const searchInputEl = document.getElementById('globalRouteSearch');
+    const searchDropdownEl = document.getElementById('searchDropdown');
+
+    searchInputEl.addEventListener('input', async (e) => {
+      const val = e.target.value.trim();
+      if (!val) { searchDropdownEl.classList.remove('active'); return; }
+
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(val)}`).then(r => r.json());
+        const results = res.data?.results || [];
+        if (results.length > 0) {
+          searchDropdownEl.innerHTML = results.map(item => `
+            <div class="search-result-item" onclick="handleSelectSearchResult('${item.route || item.code}')">
+              <div>
+                <strong style="color: var(--cyan-400); font-family: 'JetBrains Mono';">${item.route || item.code}</strong>
+                <span style="font-size: 0.75rem; color: var(--text-muted); margin-left: 8px;">${item.routeName || item.city || ''}</span>
+              </div>
+              <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">${item.type}</span>
+            </div>
+          `).join('');
+          searchDropdownEl.classList.add('active');
+        } else {
+          searchDropdownEl.classList.remove('active');
+        }
+      } catch (err) {
+        searchDropdownEl.classList.remove('active');
+      }
+    });
+
+    searchInputEl.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') { searchDropdownEl.classList.remove('active'); triggerSearch(); }
+    });
+
+    function handleSelectSearchResult(val) {
+      searchDropdownEl.classList.remove('active');
+      if (val.includes('-')) {
+        const p = val.split('-');
+        selectRoute(p[0], p[1]);
+      } else {
+        document.getElementById('globalRouteSearch').value = val;
+        triggerSearch();
+      }
+    }
+
+    // =========================================================================
+    //  MASTER ROUTES TABLE
+    // =========================================================================
+    async function renderAllRoutesTable() {
+      if (cachedRoutesList.length === 0) await loadRoutesList();
+
+      const routes = cachedRoutesList;
+      document.getElementById('allRoutesCount').textContent = routes.length;
+
+      if (routes.length === 0) {
+        document.getElementById('allRoutesTableBody').innerHTML = '<tr><td colspan="8" class="empty-state"><div class="empty-state-icon">🗺️</div><div class="empty-state-title">No routes tracked. Use Search & Scrape to start monitoring routes.</div></td></tr>';
+        return;
+      }
+
+      document.getElementById('allRoutesTableBody').innerHTML = routes.map(r => {
+        const c24 = r.change24h !== null && r.change24h !== undefined ? r.change24h : 0.0;
+        const c7 = r.change7d !== null && r.change7d !== undefined ? r.change7d : 0.0;
+        const c24Color = c24 > 0 ? 'var(--rose-400)' : c24 < 0 ? 'var(--emerald-400)' : 'var(--text-muted)';
+        const c7Color = c7 > 0 ? 'var(--rose-400)' : c7 < 0 ? 'var(--emerald-400)' : 'var(--text-muted)';
+
+        return `
+        <tr onclick="selectRoute('${r.origin}','${r.destination}')">
+          <td class="route-badge-cell">${r.origin} ↔ ${r.destination}</td>
+          <td><strong>${r.routeName || cityName(r.origin) + ' ↔ ' + cityName(r.destination)}</strong></td>
+          <td class="price-cell" style="color: var(--cyan-400);">${formatINR(r.currentFare)}</td>
+          <td>${formatINR(r.baseFare)}</td>
+          <td><span style="color: var(--emerald-400); font-weight: 700;">${r.index?.toFixed(1) ?? '—'}</span></td>
+          <td><span style="color: ${c24Color}; font-weight: 700; font-family: 'JetBrains Mono', monospace;">${signedNum(c24, 1, '%')}</span></td>
+          <td><span style="color: ${c7Color}; font-weight: 700; font-family: 'JetBrains Mono', monospace;">${signedNum(c7, 1, '%')}</span></td>
+          <td>${r.weight != null ? (r.weight * 100).toFixed(2) + '%' : '—'}</td>
+          <td><button class="action-btn-3d" style="padding: 4px 10px; font-size: 0.72rem;">Inspect →</button></td>
+        </tr>
+      `;
+      }).join('');
+    }
+
+    // =========================================================================
+    //  DATA LOADING — fetch real data from APIs on startup
+    // =========================================================================
+    async function loadRoutesList() {
+      try {
+        const res = await fetch('/api/routes').then(r => r.json());
+        if (res.success && res.data) {
+          cachedRoutesList = res.data.routes || [];
+          renderQuickRoutePills(cachedRoutesList);
+        }
+      } catch (e) {
+        console.warn('Could not load routes:', e.message);
+      }
+    }
+
+    async function loadDashboardData() {
+      try {
+        const res = await fetch('/api/dashboard').then(r => r.json());
+        if (res.success && res.data) {
+          cachedDashboard = res.data;
+          const s = res.data.summary;
+
+          // Update top nav index from live API data
+          document.getElementById('topNavIndexVal').textContent = s.indiaAirfareIndex?.toFixed(2) ?? '—';
+
+          // Change indicator
+          if (s.change24h !== null && s.change24h !== undefined) {
+            const changeEl = document.getElementById('topNavIndexChange');
+            changeEl.textContent = signedNum(s.change24h, 2, '%');
+            changeEl.style.color = s.change24h >= 0 ? 'var(--emerald-400)' : 'var(--rose-400)';
+          } else {
+            // Compute from index vs base
+            const indexDelta = ((s.indiaAirfareIndex - 100) / 100) * 100;
+            const changeEl = document.getElementById('topNavIndexChange');
+            changeEl.textContent = signedNum(indexDelta, 2, '%');
+            changeEl.style.color = indexDelta >= 0 ? 'var(--emerald-400)' : 'var(--rose-400)';
+          }
+
+          // Anomaly badge from data quality
+          document.getElementById('anomalyCountBadge').textContent = res.data.warnings?.length || '0';
+
+          return s;
+        }
+      } catch (e) {
+        console.warn('Dashboard fetch error:', e.message);
+      }
+      return null;
+    }
+
+    // =========================================================================
+    //  API ROUTES EXPLORER — interactive testing of all REST endpoints
+    // =========================================================================
+    const ALL_API_ENDPOINTS = [
+      {
+        category: "system",
+        method: "GET",
+        path: "/api/health",
+        title: "Health Check & Service Status",
+        desc: "Returns server uptime, memory usage, and database connectivity status.",
+        params: []
+      },
+      {
+        category: "system",
+        method: "POST",
+        path: "/api/refresh",
+        title: "Refresh Master Index Cache",
+        desc: "Forces a fresh calculation pass across the master index pipeline and invalidates in-memory cache.",
+        params: [],
+        body: null
+      },
+      {
+        category: "index",
+        method: "GET",
+        path: "/api/index",
+        title: "Current Airfare Index Value",
+        desc: "Returns the latest national composite index, base period reference, and route weights.",
+        params: []
+      },
+      {
+        category: "index",
+        method: "GET",
+        path: "/api/index/history",
+        title: "Historical Index Snapshots",
+        desc: "Historical time-series of calculated index snapshots including 24h & 7d changes.",
+        params: [
+          { name: "limit", defaultVal: "30", placeholder: "30", hint: "number of snapshots" }
+        ]
+      },
+      {
+        category: "dashboard",
+        method: "GET",
+        path: "/api/dashboard",
+        title: "Full Aggregated Dashboard Payload",
+        desc: "Complete dashboard summary payload including 24h/7d change, top routes, and stream health.",
+        params: []
+      },
+      {
+        category: "routes",
+        method: "GET",
+        path: "/api/routes",
+        title: "List Monitored Domestic Routes",
+        desc: "Returns all monitored routes with spot fare, base fare, index, 24h/7d change, and passenger volumes.",
+        params: [
+          { name: "limit", defaultVal: "15", placeholder: "15", hint: "result limit" },
+          { name: "sort", defaultVal: "volume", placeholder: "volume", hint: "volume, index_desc, fare_desc" },
+          { name: "search", defaultVal: "", placeholder: "DEL", hint: "city or airport code" }
+        ]
+      },
+      {
+        category: "routes",
+        method: "GET",
+        path: "/api/routes/:route",
+        title: "Route Detail & Observations",
+        desc: "Detailed inspection of an individual route corridor including carrier fare observations.",
+        params: [
+          { name: ":route", defaultVal: "BOM-DEL", placeholder: "BOM-DEL", hint: "canonical route pair", isPath: true }
+        ]
+      },
+      {
+        category: "routes",
+        method: "GET",
+        path: "/api/routes/:route/history",
+        title: "Route Historical Fare Trend",
+        desc: "Historical fare observations and trajectory for a specific route corridor.",
+        params: [
+          { name: ":route", defaultVal: "BOM-DEL", placeholder: "BOM-DEL", hint: "canonical route pair", isPath: true },
+          { name: "period", defaultVal: "30d", placeholder: "30d", hint: "7d, 30d, 90d" }
+        ]
+      },
+      {
+        category: "search",
+        method: "GET",
+        path: "/api/search",
+        title: "Search Routes, Cities & Scrape on Demand",
+        desc: "Search database-first; automatically triggers on-demand 30-day scrape if data is stale.",
+        params: [
+          { name: "q", defaultVal: "DEL-GOI", placeholder: "DEL-GOI", hint: "search query" },
+          { name: "origin", defaultVal: "DEL", placeholder: "DEL", hint: "origin IATA" },
+          { name: "destination", defaultVal: "GOI", placeholder: "GOI", hint: "destination IATA" },
+          { name: "departureDate", defaultVal: "2026-09-01", placeholder: "2026-09-01", hint: "YYYY-MM-DD" },
+          { name: "days", defaultVal: "30", placeholder: "30", hint: "days count (default 30)" },
+          { name: "source", defaultVal: "Air India", placeholder: "Air India", hint: "carrier name" }
+        ]
+      },
+      {
+        category: "data",
+        method: "GET",
+        path: "/api/data/status",
+        title: "Data Pipeline Status & Counts",
+        desc: "Health status of file and MongoDB data streams, observation counts, and cache state.",
+        params: []
+      },
+      {
+        category: "data",
+        method: "GET",
+        path: "/api/data/quality",
+        title: "Data Quality & Basket Audit",
+        desc: "Audit of missing routes, pricing anomalies, and basket validation warnings.",
+        params: []
+      },
+      {
+        category: "scraper",
+        method: "GET",
+        path: "/api/scraper/status",
+        title: "Scraper Runtime & Background Task Status",
+        desc: "Current status of background scrapers, total observations collected, and 24h/7d price change.",
+        params: []
+      },
+      {
+        category: "scraper",
+        method: "GET",
+        path: "/api/scraper/jobs",
+        title: "List Configured Scrape Targets",
+        desc: "All scheduled background scrape jobs with schedule, priority, and enabled status.",
+        params: []
+      },
+      {
+        category: "scraper",
+        method: "POST",
+        path: "/api/scraper/run",
+        title: "Manually Trigger 30-Day Scrape Task",
+        desc: "Triggers scraper cycle for all enabled jobs or a specific route on demand.",
+        params: [],
+        body: JSON.stringify({ origin: "DEL", destination: "GOI", departureDate: "2026-09-01", days: 30, source: "Air India" }, null, 2)
+      },
+      {
+        category: "scraper",
+        method: "POST",
+        path: "/api/scraper/jobs",
+        title: "Create New Scrape Job",
+        desc: "Registers a new route to be continuously scraped by background cron jobs.",
+        params: [],
+        body: JSON.stringify({ source: "Air India", origin: "DEL", destination: "BOM", departureDate: "2026-09-15", days: 30, enabled: true, priority: 1 }, null, 2)
+      },
+      {
+        category: "cpi",
+        method: "GET",
+        path: "/api/cpi",
+        title: "CPI Augmentation Macro Summary",
+        desc: "Official MOSPI CPI integration, transport group shifts, and nowcast advantage.",
+        params: []
+      },
+      {
+        category: "cpi",
+        method: "GET",
+        path: "/api/cpi/basket",
+        title: "CPI Transport Basket Breakdown",
+        desc: "Corridor contributions to national transport index disaggregated by route.",
+        params: []
+      },
+      {
+        category: "cpi",
+        method: "GET",
+        path: "/api/cpi/simulate",
+        title: "Inflation Policy Shock Simulator",
+        desc: "Simulate headline CPI shifts resulting from hypothetical percentage changes in airfares.",
+        params: [
+          { name: "shock", defaultVal: "10", placeholder: "10", hint: "percentage shock (-30 to +30)" }
+        ]
+      }
+    ];
+
+    let currentApiCatFilter = 'all';
+
+    function initApiExplorer() {
+      renderApiRoutes(currentApiCatFilter);
+      refreshApiScraperStatus();
+    }
+
+    function filterApiCategory(cat, btn) {
+      currentApiCatFilter = cat;
+      document.querySelectorAll('.api-cat-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderApiRoutes(cat);
+    }
+
+    function renderApiRoutes(category) {
+      const container = document.getElementById('apiRoutesCardsContainer');
+      if (!container) return;
+
+      const filtered = category === 'all'
+        ? ALL_API_ENDPOINTS
+        : ALL_API_ENDPOINTS.filter(e => e.category === category);
+
+      const totalCountEl = document.getElementById('apiTotalCount');
+      if (totalCountEl) totalCountEl.textContent = ALL_API_ENDPOINTS.length;
+
+      container.innerHTML = filtered.map((ep) => {
+        const realIdx = ALL_API_ENDPOINTS.indexOf(ep);
+        const hasParams = ep.params && ep.params.length > 0;
+        const hasBody = ep.body !== undefined && ep.body !== null;
+
+        return `
+          <div class="api-route-card" id="apiCard_${realIdx}">
+            <div class="api-route-header" onclick="toggleApiCard(${realIdx})">
+              <span class="method-badge method-${ep.method}">${ep.method}</span>
+              <span class="api-path-text">${ep.path}</span>
+              <span class="api-desc-text">${ep.title}</span>
+              <span style="color: var(--text-muted); font-size: 0.8rem; margin-left: 8px;">▼</span>
+            </div>
+            <div class="api-route-body" id="apiBody_${realIdx}">
+              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px;">${ep.desc}</p>
+              
+              ${hasParams ? `
+                <div class="api-param-grid">
+                  ${ep.params.map(p => `
+                    <div>
+                      <div class="api-param-label">
+                        <span>${p.name}</span>
+                        <span style="opacity: 0.7;">${p.hint}</span>
+                      </div>
+                      <input type="text" class="api-param-input" id="param_${realIdx}_${p.name}" value="${p.defaultVal || ''}" placeholder="${p.placeholder || ''}" />
+                    </div>
+                  `).join('')}
+                </div>
+              ` : ''}
+
+              ${hasBody ? `
+                <div style="margin-bottom: 6px;">
+                  <div class="api-param-label">Request Body (JSON)</div>
+                  <textarea class="api-body-textarea" id="body_${realIdx}">${ep.body}</textarea>
+                </div>
+              ` : ''}
+
+              <div class="api-controls-row">
+                <button class="btn-send-api" id="sendBtn_${realIdx}" onclick="executeApiCall(${realIdx})">
+                  ⚡ Send Request
+                </button>
+                <div class="api-resp-meta" id="respMeta_${realIdx}" style="display: none;">
+                  <span class="api-status-badge" id="respStatusBadge_${realIdx}">—</span>
+                  <span style="color: var(--text-muted);" id="respLatency_${realIdx}">—</span>
+                  <button class="btn-copy-resp" onclick="copyApiResponse(${realIdx})">📋 Copy JSON</button>
+                </div>
+              </div>
+
+              <div id="respContainer_${realIdx}" style="display: none;">
+                <pre class="api-resp-pre" id="respPre_${realIdx}">Waiting for response...</pre>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleApiCard(idx) {
+      const body = document.getElementById(`apiBody_${idx}`);
+      if (body) {
+        body.classList.toggle('open');
+      }
+    }
+
+    async function executeApiCall(idx) {
+      const ep = ALL_API_ENDPOINTS[idx];
+      if (!ep) return;
+
+      const sendBtn = document.getElementById(`sendBtn_${idx}`);
+      const metaBox = document.getElementById(`respMeta_${idx}`);
+      const statusBadge = document.getElementById(`respStatusBadge_${idx}`);
+      const latencyEl = document.getElementById(`respLatency_${idx}`);
+      const preEl = document.getElementById(`respPre_${idx}`);
+      const respBox = document.getElementById(`respContainer_${idx}`);
+
+      sendBtn.classList.add('loading');
+      sendBtn.textContent = 'Executing…';
+      metaBox.style.display = 'flex';
+      respBox.style.display = 'block';
+      preEl.textContent = 'Connecting and fetching response…';
+
+      // Build target URL with params
+      let url = ep.path;
+      const queryParams = [];
+
+      if (ep.params && ep.params.length > 0) {
+        for (const p of ep.params) {
+          const inputEl = document.getElementById(`param_${idx}_${p.name}`);
+          const val = inputEl ? inputEl.value.trim() : (p.defaultVal || '');
+          if (p.isPath) {
+            url = url.replace(p.name, encodeURIComponent(val));
+          } else if (val) {
+            queryParams.push(`${encodeURIComponent(p.name)}=${encodeURIComponent(val)}`);
+          }
+        }
+      }
+
+      if (queryParams.length > 0) {
+        url += (url.includes('?') ? '&' : '?') + queryParams.join('&');
+      }
+
+      const options = { method: ep.method };
+
+      if (ep.method === 'POST' || ep.method === 'PATCH') {
+        options.headers = { 'Content-Type': 'application/json' };
+        const bodyInput = document.getElementById(`body_${idx}`);
+        if (bodyInput && bodyInput.value.trim()) {
+          try {
+            JSON.parse(bodyInput.value.trim());
+            options.body = bodyInput.value.trim();
+          } catch (jsonErr) {
+            preEl.textContent = `Invalid JSON Body Error: ${jsonErr.message}`;
+            sendBtn.classList.remove('loading');
+            sendBtn.textContent = '⚡ Send Request';
+            return;
+          }
+        }
+      }
+
+      const tStart = performance.now();
+
+      try {
+        const resp = await fetch(url, options);
+        const tEnd = performance.now();
+        const latency = Math.round(tEnd - tStart);
+
+        latencyEl.textContent = `${latency}ms`;
+        statusBadge.textContent = `${resp.status} ${resp.statusText || ''}`;
+        statusBadge.className = `api-status-badge ${resp.ok ? 'api-status-2xx' : resp.status < 500 ? 'api-status-4xx' : 'api-status-5xx'}`;
+
+        const contentType = resp.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const json = await resp.json();
+          preEl.textContent = JSON.stringify(json, null, 2);
+        } else {
+          preEl.textContent = await resp.text();
+        }
+
+        if (ep.path.includes('scraper') || ep.path.includes('refresh')) {
+          refreshApiScraperStatus();
+          loadDashboardData();
+        }
+
+      } catch (fetchErr) {
+        statusBadge.textContent = 'Error';
+        statusBadge.className = 'api-status-badge api-status-5xx';
+        latencyEl.textContent = '—';
+        preEl.textContent = `Network / Execution Error: ${fetchErr.message}`;
+      } finally {
+        sendBtn.classList.remove('loading');
+        sendBtn.textContent = '⚡ Send Request';
+      }
+    }
+
+    function copyApiResponse(idx) {
+      const pre = document.getElementById(`respPre_${idx}`);
+      if (pre && pre.textContent) {
+        navigator.clipboard.writeText(pre.textContent).then(() => {
+          showToast('Response JSON copied to clipboard!');
+        });
+      }
+    }
+
+    async function refreshApiScraperStatus() {
+      try {
+        const res = await fetch('/api/scraper/status').then(r => r.json());
+        if (res.success && res.data) {
+          const s = res.data;
+          const statusEl = document.getElementById('apiScraperRuntimeStatus');
+          if (statusEl) {
+            statusEl.textContent = s.running ? 'RUNNING' : 'IDLE / READY';
+            statusEl.style.color = s.running ? 'var(--amber-400)' : 'var(--emerald-400)';
+          }
+
+          const obsEl = document.getElementById('apiScraperObsCount');
+          if (obsEl) obsEl.textContent = (s.observationsCollected || 0).toLocaleString();
+
+          if (s.lastSuccessAt) {
+            const lastEl = document.getElementById('apiScraperLastRun');
+            if (lastEl) lastEl.textContent = `Last: ${new Date(s.lastSuccessAt).toLocaleTimeString()}`;
+          }
+
+          const c24 = s.lastChange24h !== undefined && s.lastChange24h !== null ? s.lastChange24h : 0.0;
+          const c7 = s.lastChange7d !== undefined && s.lastChange7d !== null ? s.lastChange7d : 0.0;
+
+          const c24El = document.getElementById('apiScraper24hChange');
+          if (c24El) {
+            c24El.textContent = signedNum(c24, 2, '%');
+            c24El.style.color = c24 > 0 ? 'var(--rose-400)' : c24 < 0 ? 'var(--emerald-400)' : 'var(--text-muted)';
+          }
+
+          const c7El = document.getElementById('apiScraper7dChange');
+          if (c7El) {
+            c7El.textContent = signedNum(c7, 2, '%');
+            c7El.style.color = c7 > 0 ? 'var(--rose-400)' : c7 < 0 ? 'var(--emerald-400)' : 'var(--text-muted)';
+          }
+        }
+      } catch (e) {
+        console.warn('Scraper status fetch notice:', e.message);
+      }
+    }
+
+    async function triggerScraperRunDirect() {
+      showLoading('Triggering 30-day background scraping cycle…', 'Executing all enabled jobs via /api/scraper/run');
+      try {
+        const res = await fetch('/api/scraper/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ days: 30 })
+        }).then(r => r.json());
+        hideLoading();
+
+        if (res.success) {
+          showToast('Scraper cycle triggered successfully for 30-day horizon!');
+          refreshApiScraperStatus();
+          loadDashboardData();
+        } else {
+          showToast(`Scrape trigger notice: ${res.error?.message || 'Started'}`);
+        }
+      } catch (err) {
+        hideLoading();
+        showToast(`Scraper error: ${err.message}`);
+      }
+    }
+
+    // =========================================================================
+    //  INIT — everything fetched dynamically, nothing hardcoded
+    // =========================================================================
+    async function init() {
+      // Load dashboard summary + routes list in parallel
+      const [dashSummary] = await Promise.all([
+        loadDashboardData(),
+        loadRoutesList()
+      ]);
+
+      // Auto-select first route from the routes list
+      if (cachedRoutesList.length > 0) {
+        const first = cachedRoutesList[0];
+        await selectRoute(first.origin, first.destination);
+      } else {
+        // No routes — show empty state
+        setEmptyRouteState();
+        document.getElementById('headerRouteTitle').textContent = 'No routes tracked yet';
+        document.getElementById('breadcrumbRouteLabel').textContent = '—';
+        document.getElementById('headerRoutePill').textContent = '—';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

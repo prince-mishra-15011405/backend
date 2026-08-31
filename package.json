@@ -1,0 +1,48 @@
+{
+  "name": "airfare-index",
+  "version": "1.0.0",
+  "description": "Backend calculation engine & Express REST API for India Airfare Price Index & Intelligence Dashboard",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "server": "node server/server.js",
+    "cli": "node index.js",
+    "test": "node test/verify.js",
+    "test:api": "node test/api.test.js",
+    "test:cpi": "node test/cpi.test.js",
+    "test:airindia": "node scripts/test-airindia.js",
+    "test:spicejet": "node scripts/test-spicejet.js",
+    "test:makemytrip": "node scripts/test-makemytrip.js",
+    "test:agoda": "node scripts/test-agoda.js",
+    "test:irctc": "node scripts/test-irctc.js",
+    "scrape": "node scripts/run-scraper.js",
+    "index": "node scripts/calculate-index.js",
+    "import:dgca": "node scripts/import-dgca.js",
+    "import:history": "node scripts/import-history.js",
+    "import:airports": "node scripts/import-airports.js",
+    "seed:jobs": "node scripts/seed-scrape-jobs.js"
+  },
+  "keywords": [
+    "airfare",
+    "index",
+    "cpi",
+    "dgca",
+    "aviation",
+    "india",
+    "express",
+    "api",
+    "mongodb",
+    "puppeteer",
+    "cron"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.10.0",
+    "node-cron": "^3.0.3",
+    "puppeteer": "^24.2.1"
+  }
+}

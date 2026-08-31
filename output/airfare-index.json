@@ -1,0 +1,278 @@
+{
+  "referenceYear": 2026,
+  "basePeriod": {
+    "start": "2026-01-01",
+    "end": "2026-01-31"
+  },
+  "basketSize": 30,
+  "indiaAirfareIndex": 0,
+  "totalRoutesConsidered": 0,
+  "routes": [],
+  "warnings": [
+    {
+      "route": "AMD-BLR",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "AMD-BOM",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "AMD-CCU",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "AMD-COK",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "AMD-DEL",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "AMD-HYD",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "AMD-IXC",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "AMD-JAI",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "AMD-LKO",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "AMD-MAA",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "AMD-PNQ",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BLR-BOM",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BLR-CCU",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BLR-COK",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BLR-DEL",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BLR-HYD",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BLR-IXC",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BLR-JAI",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BLR-LKO",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BLR-MAA",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BLR-PNQ",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BOM-CCU",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BOM-COK",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BOM-DEL",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BOM-HYD",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BOM-IXC",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BOM-JAI",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BOM-LKO",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BOM-MAA",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "BOM-PNQ",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "CCU-COK",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "CCU-DEL",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "CCU-HYD",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "CCU-IXC",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "CCU-JAI",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "CCU-LKO",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "CCU-MAA",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "CCU-PNQ",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "COK-DEL",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "COK-HYD",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "COK-IXC",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "COK-JAI",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "COK-LKO",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "COK-MAA",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "COK-PNQ",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "DEL-HYD",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "DEL-IXC",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "DEL-JAI",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "DEL-LKO",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "DEL-MAA",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "DEL-PNQ",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "HYD-IXC",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "HYD-JAI",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "HYD-LKO",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "HYD-MAA",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "HYD-PNQ",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "IXC-JAI",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "IXC-LKO",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "IXC-MAA",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "IXC-PNQ",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "JAI-LKO",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "JAI-MAA",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "JAI-PNQ",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "LKO-MAA",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "LKO-PNQ",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    },
+    {
+      "route": "MAA-PNQ",
+      "reason": "Current fare data missing or invalid (no positive observations)"
+    }
+  ],
+  "calculatedAt": "2026-08-31T06:59:04.841Z"
+}
